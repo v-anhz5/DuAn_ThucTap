@@ -1,0 +1,3 @@
+// Script tự động đồng bộ brand cho bảng products
+// Chạy trên file db.json
+// Sau khi sửa, tất cả sản phẩm sẽ có brand đúng chuẩn như FE 

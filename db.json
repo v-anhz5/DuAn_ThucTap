@@ -1,0 +1,901 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Nike Air Max",
+      "brand": "Nike",
+      "image": "icon_nike.webp",
+      "description": "Giày Nike Air Max chính hãng, thiết kế thể thao, năng động."
+    },
+    {
+      "id": "2",
+      "name": "Adidas Ultra Boost",
+      "brand": "Adidas",
+      "image": "icon_adidas.jpg",
+      "description": "Adidas Ultra Boost - giày chạy bộ cao cấp, êm ái."
+    },
+    {
+      "id": "af64",
+      "name": "Giiafy Puma",
+      "brand": "Nike",
+      "image": "https://bizweb.dktcdn.net/thumb/1024x1024/100/347/092/products/nike-air-jordan-1-low-gs-553560-141.jpg",
+      "description": " Từ ngày 1/6/2024 BOSS GIÀY ĐỔI TÊN THÀNH BG SNEAKER✅ Hàng chính hãng có sẵn tại BGSNEAKER✅ Bảo hành sản phẩm chính"
+    },
+    {
+      "id": "7f7b",
+      "name": "adidas",
+      "brand": "Adidas",
+      "image": "https://product.hstatic.net/200000174405/product/1_d97150e46b334d67af9e4b6f41979dfe_master.jpg",
+      "price": 540000,
+      "oldPrice": 980000,
+      "rating": 4.5,
+      "reviews": 100,
+      "discount": 40,
+      "sold": 1,
+      "description": "Sẵn sàng cho sự thoải mái và phong cách với đôi giày adidas Grand Court Cloudfoam - Cloud White / Core Black / Cloud White!Nâng cao phong cách",
+      "images": [
+        "https://product.hstatic.net/200000174405/product/1_d97150e46b334d67af9e4b6f41979dfe_master.jpg",
+        "https://product.hstatic.net/200000174405/product/3_89f9dca5c41f499788a99b49307cb0ab_master.jpg",
+        "https://product.hstatic.net/200000174405/product/4_288525a4a05a4b3695beacef11c8dbdf_master.jpg",
+        "https://product.hstatic.net/200000174405/product/5_373402555b6b454596f6c8a9a9d3d96d_master.jpg"
+      ]
+    },
+    {
+      "id": "e19c",
+      "name": "Giay Fila ",
+      "brand": "FILA",
+      "images": [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdExsY_7AUUg5ZFQW0e8jkIOJi-RF79yrIsg&s",
+        "https://bizweb.dktcdn.net/thumb/1024x1024/100/467/909/products/fila-interlation-black-1jm00790-1.jpg?v=1720892187787",
+        "https://bizweb.dktcdn.net/100/467/909/products/z3673657730380-0e4ca81bed0d9ef394d513b7e60daa6e.jpg?v=1720892187750"
+      ],
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdExsY_7AUUg5ZFQW0e8jkIOJi-RF79yrIsg&s",
+      "price": 1200000,
+      "oldPrice": 1700000,
+      "rating": 4.5,
+      "reviews": 100,
+      "discount": 27,
+      "sold": 0,
+      "description": "Giày Fila chính hãng từ Adidas, Nike, UA, Speedo, Columbia & Hoka tại Supersports Vietnam - Nhận ngay voucher 150K cho khách hàng mới,"
+    },
+    {
+      "id": "85a6",
+      "name": "Giày VANS SKATE OLD SKOOL PEWTER WHITE ",
+      "brand": "Vans",
+      "images": [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdExsY_7AUUg5ZFQW0e8jkIOJi-RF79yrIsg&s",
+        "https://product.hstatic.net/200000174405/product/1_d97150e46b334d67af9e4b6f41979dfe_master.jpg",
+        "https://bizweb.dktcdn.net/thumb/1024x1024/100/140/774/products/giay-vans-skate-old-skool-pewter-white-vn0a5fcb1n6-1-989e28c0-f120-425c-b6a6-d6c183403d7b.jpg?v=1726456859670"
+      ],
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdExsY_7AUUg5ZFQW0e8jkIOJi-RF79yrIsg&s",
+      "price": 1400000,
+      "oldPrice": 1700000,
+      "rating": 4.8,
+      "reviews": 100,
+      "discount": 20,
+      "sold": 0,
+      "description": "Dòng sản phẩm: Old Skool Mã SKU: VN0A5FCB1N6 Chất liệu: Suede, Canvas Màu sắc: Pewter White Giới tính: Unisex"
+    }
+  ],
+  "variants": [
+    {
+      "id": "1",
+      "productId": 1,
+      "size": 38,
+      "color": "black",
+      "price": 2500000,
+      "stock": 10
+    },
+    {
+      "id": "2",
+      "productId": 1,
+      "size": 39,
+      "color": "black",
+      "price": 2500000,
+      "stock": 8
+    },
+    {
+      "id": "3",
+      "productId": 1,
+      "size": 40,
+      "color": "white",
+      "price": 2500000,
+      "stock": 5
+    },
+    {
+      "id": "4",
+      "productId": 1,
+      "size": 41,
+      "color": "red",
+      "price": 2500000,
+      "stock": 3
+    },
+    {
+      "id": "5",
+      "productId": 2,
+      "size": 40,
+      "color": "black",
+      "price": 3200000,
+      "stock": 7
+    },
+    {
+      "id": "6",
+      "productId": 2,
+      "size": 41,
+      "color": "white",
+      "price": 3200000,
+      "stock": 4
+    },
+    {
+      "id": "7a9d",
+      "productId": "af64",
+      "size": 41,
+      "color": "red",
+      "price": 590000,
+      "stock": 12
+    },
+    {
+      "id": "75d4",
+      "productId": "af64",
+      "size": 42,
+      "color": "blue",
+      "price": 999999,
+      "stock": 2
+    },
+    {
+      "id": "427c",
+      "productId": "7f7b",
+      "size": 40,
+      "color": "black",
+      "price": 540000,
+      "stock": 10
+    },
+    {
+      "id": "11c8",
+      "productId": "7f7b",
+      "size": 41,
+      "color": "black",
+      "price": 540000,
+      "stock": 10
+    },
+    {
+      "id": "bb48",
+      "productId": "7f7b",
+      "size": 42,
+      "color": "black",
+      "price": 540000,
+      "stock": 10
+    },
+    {
+      "id": "eeb7",
+      "productId": "7f7b",
+      "size": 43,
+      "color": "black",
+      "price": 540000,
+      "stock": 10
+    },
+    {
+      "id": "e288",
+      "productId": "7f7b",
+      "size": 39,
+      "color": "black",
+      "price": 540000,
+      "stock": 1
+    },
+    {
+      "id": "c2ec",
+      "productId": "7f7b",
+      "size": 40,
+      "color": "white",
+      "price": 370999,
+      "stock": 2
+    },
+    {
+      "id": "cf77",
+      "productId": "7f7b",
+      "size": 38,
+      "color": "#ffa500",
+      "price": 999999,
+      "stock": 4
+    },
+    {
+      "id": "3919",
+      "productId": "7f7b",
+      "size": 36,
+      "color": "#ff0000",
+      "price": 700000,
+      "stock": 21
+    },
+    {
+      "id": "619b",
+      "productId": "7f7b",
+      "size": 37,
+      "color": "#ff0000",
+      "price": 700000,
+      "stock": 21
+    },
+    {
+      "id": "1830",
+      "productId": "7f7b",
+      "size": 38,
+      "color": "#ff0000",
+      "price": 700000,
+      "stock": 21
+    },
+    {
+      "id": "5aa4",
+      "productId": "7f7b",
+      "size": 39,
+      "color": "#ff0000",
+      "price": 700000,
+      "stock": 21
+    },
+    {
+      "id": "a419",
+      "productId": "7f7b",
+      "size": 40,
+      "color": "#ff0000",
+      "price": 700000,
+      "stock": 21
+    },
+    {
+      "id": "9a03",
+      "productId": "7f7b",
+      "size": 41,
+      "color": "#ff0000",
+      "price": 700000,
+      "stock": 21
+    },
+    {
+      "id": "4345",
+      "productId": "7f7b",
+      "size": 42,
+      "color": "#ff0000",
+      "price": 700000,
+      "stock": 21
+    },
+    {
+      "id": "2f62",
+      "productId": "7f7b",
+      "size": 44,
+      "color": "#ff0000",
+      "price": 700000,
+      "stock": 21
+    },
+    {
+      "id": "9ef6",
+      "productId": "7f7b",
+      "size": 43,
+      "color": "#ff0000",
+      "price": 700000,
+      "stock": 21
+    },
+    {
+      "id": "3f69",
+      "productId": "7f7b",
+      "size": 45,
+      "color": "#ff0000",
+      "price": 700000,
+      "stock": 21
+    },
+    {
+      "id": "063c",
+      "productId": "e19c",
+      "size": 36,
+      "color": "#ffa500",
+      "price": 1000000,
+      "stock": 0
+    },
+    {
+      "id": "fcd2",
+      "productId": "e19c",
+      "size": 37,
+      "color": "#ffa500",
+      "price": 1000000,
+      "stock": 0
+    },
+    {
+      "id": "6268",
+      "productId": "e19c",
+      "size": 38,
+      "color": "#ffa500",
+      "price": 1000000,
+      "stock": 0
+    },
+    {
+      "id": "931c",
+      "productId": "e19c",
+      "size": 45,
+      "color": "#ffa500",
+      "price": 1000000,
+      "stock": 0
+    },
+    {
+      "id": "281e",
+      "productId": "e19c",
+      "size": 37,
+      "color": "#ffff00",
+      "price": 1500000,
+      "stock": 0
+    },
+    {
+      "id": "b6d3",
+      "productId": "e19c",
+      "size": 40,
+      "color": "#ffff00",
+      "price": 1500000,
+      "stock": 0
+    },
+    {
+      "id": "3b06",
+      "productId": "e19c",
+      "size": 41,
+      "color": "#ffff00",
+      "price": 1500000,
+      "stock": 0
+    },
+    {
+      "id": "31c5",
+      "productId": "e19c",
+      "size": 42,
+      "color": "#ffff00",
+      "price": 1500000,
+      "stock": 0
+    },
+    {
+      "id": "7cae",
+      "productId": "e19c",
+      "size": 43,
+      "color": "#ffff00",
+      "price": 1500000,
+      "stock": 0
+    },
+    {
+      "id": "11ba",
+      "productId": "e19c",
+      "size": 37,
+      "color": "#ff0000",
+      "price": 1340000,
+      "stock": 0
+    },
+    {
+      "id": "4890",
+      "productId": "e19c",
+      "size": 43,
+      "color": "#ff0000",
+      "price": 1340000,
+      "stock": 0
+    },
+    {
+      "id": "c1c0",
+      "productId": "e19c",
+      "size": 42,
+      "color": "#ff0000",
+      "price": 1340000,
+      "stock": 0
+    },
+    {
+      "id": "34c5",
+      "productId": "e19c",
+      "size": 44,
+      "color": "#ff0000",
+      "price": 1340000,
+      "stock": 0
+    },
+    {
+      "id": "62d4",
+      "productId": "e19c",
+      "size": 45,
+      "color": "#ff0000",
+      "price": 1340000,
+      "stock": 0
+    },
+    {
+      "id": "5ec5",
+      "productId": "85a6",
+      "size": 36,
+      "color": "#000000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "9e44",
+      "productId": "85a6",
+      "size": 42,
+      "color": "#ff0000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "ba5a",
+      "productId": "85a6",
+      "size": 42,
+      "color": "#0000ff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "2852",
+      "productId": "85a6",
+      "size": 42,
+      "color": "#ffff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "fa00",
+      "productId": "85a6",
+      "size": 42,
+      "color": "#00ff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "bf10",
+      "productId": "85a6",
+      "size": 42,
+      "color": "#ffa500",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "fecb",
+      "productId": "85a6",
+      "size": 43,
+      "color": "#000000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "d411",
+      "productId": "85a6",
+      "size": 43,
+      "color": "#ffffff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "33cd",
+      "productId": "85a6",
+      "size": 43,
+      "color": "#ff0000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "b35c",
+      "productId": "85a6",
+      "size": 43,
+      "color": "#0000ff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "ace4",
+      "productId": "85a6",
+      "size": 43,
+      "color": "#ffff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "183f",
+      "productId": "85a6",
+      "size": 43,
+      "color": "#00ff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "19f5",
+      "productId": "85a6",
+      "size": 43,
+      "color": "#ffa500",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "87dc",
+      "productId": "85a6",
+      "size": 44,
+      "color": "#000000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "3d36",
+      "productId": "85a6",
+      "size": 44,
+      "color": "#ffffff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "f468",
+      "productId": "85a6",
+      "size": 44,
+      "color": "#ff0000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "43ea",
+      "productId": "85a6",
+      "size": 44,
+      "color": "#0000ff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "865d",
+      "productId": "85a6",
+      "size": 44,
+      "color": "#ffff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "5ac3",
+      "productId": "85a6",
+      "size": 44,
+      "color": "#00ff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "0d7e",
+      "productId": "85a6",
+      "size": 44,
+      "color": "#ffa500",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "4e07",
+      "productId": "85a6",
+      "size": 45,
+      "color": "#000000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "4b54",
+      "productId": "85a6",
+      "size": 45,
+      "color": "#ffffff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "8212",
+      "productId": "85a6",
+      "size": 45,
+      "color": "#ff0000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "058d",
+      "productId": "85a6",
+      "size": 45,
+      "color": "#0000ff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "d4ce",
+      "productId": "85a6",
+      "size": 45,
+      "color": "#ffff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "4b0f",
+      "productId": "85a6",
+      "size": 45,
+      "color": "#00ff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "b633",
+      "productId": "85a6",
+      "size": 45,
+      "color": "#ffa500",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "e3d5",
+      "productId": "85a6",
+      "size": 36,
+      "color": "#ffffff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "d361",
+      "productId": "85a6",
+      "size": 36,
+      "color": "#ff0000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "726b",
+      "productId": "85a6",
+      "size": 36,
+      "color": "#0000ff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "bef5",
+      "productId": "85a6",
+      "size": 36,
+      "color": "#ffff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "9c91",
+      "productId": "85a6",
+      "size": 36,
+      "color": "#00ff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "4d8d",
+      "productId": "85a6",
+      "size": 36,
+      "color": "#ffa500",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "ade1",
+      "productId": "85a6",
+      "size": 37,
+      "color": "#000000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "7bf5",
+      "productId": "85a6",
+      "size": 37,
+      "color": "#ffffff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "e7cc",
+      "productId": "85a6",
+      "size": 37,
+      "color": "#ff0000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "1e16",
+      "productId": "85a6",
+      "size": 37,
+      "color": "#0000ff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "077e",
+      "productId": "85a6",
+      "size": 37,
+      "color": "#ffff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "d9fd",
+      "productId": "85a6",
+      "size": 37,
+      "color": "#00ff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "c0dc",
+      "productId": "85a6",
+      "size": 37,
+      "color": "#ffa500",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "86eb",
+      "productId": "85a6",
+      "size": 38,
+      "color": "#000000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "1fc2",
+      "productId": "85a6",
+      "size": 38,
+      "color": "#ffffff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "0468",
+      "productId": "85a6",
+      "size": 38,
+      "color": "#ff0000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "674f",
+      "productId": "85a6",
+      "size": 38,
+      "color": "#0000ff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "0a8c",
+      "productId": "85a6",
+      "size": 38,
+      "color": "#ffff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "9790",
+      "productId": "85a6",
+      "size": 38,
+      "color": "#00ff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "d649",
+      "productId": "85a6",
+      "size": 38,
+      "color": "#ffa500",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "5a2f",
+      "productId": "85a6",
+      "size": 39,
+      "color": "#000000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "b356",
+      "productId": "85a6",
+      "size": 39,
+      "color": "#ffffff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "1b27",
+      "productId": "85a6",
+      "size": 39,
+      "color": "#ff0000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "484b",
+      "productId": "85a6",
+      "size": 39,
+      "color": "#0000ff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "c358",
+      "productId": "85a6",
+      "size": 39,
+      "color": "#ffff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "49b8",
+      "productId": "85a6",
+      "size": 39,
+      "color": "#00ff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "046d",
+      "productId": "85a6",
+      "size": 39,
+      "color": "#ffa500",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "e6e3",
+      "productId": "85a6",
+      "size": 40,
+      "color": "#000000",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "7c21",
+      "productId": "85a6",
+      "size": 40,
+      "color": "#ffffff",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "92de",
+      "productId": "85a6",
+      "size": 40,
+      "color": "#ffff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "1878",
+      "productId": "85a6",
+      "size": 40,
+      "color": "#00ff00",
+      "price": 1400000,
+      "stock": 0
+    },
+    {
+      "id": "b5e6",
+      "productId": "85a6",
+      "size": 40,
+      "color": "#ffa500",
+      "price": 1400000,
+      "stock": 0
+    }
+  ],
+  "users": [
+    {
+      "id": "931e",
+      "name": "Trần Viêt Anhhh",
+      "phone": "1231231211",
+      "email": "anh@gmail.com",
+      "password": "123123",
+      "address": "HA nOi",
+      "role": "customer"
+    },
+    {
+      "id": "f80b",
+      "name": "ANH",
+      "phone": "111111111",
+      "email": "em@gmail.com",
+      "password": "123123",
+      "address": "aaa",
+      "role": "customer"
+    }
+  ],
+  "orders": [],
+  "cart": [
+    {
+      "id": "0ea6",
+      "userId": "f80b",
+      "productId": "e19c",
+      "name": "Giay Fila ",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdExsY_7AUUg5ZFQW0e8jkIOJi-RF79yrIsg&s",
+      "size": 40,
+      "color": "#ffff00",
+      "qty": 1,
+      "price": 1500000
+    }
+  ],
+  "addresses": []
+}

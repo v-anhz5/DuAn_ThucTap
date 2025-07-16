@@ -6,21 +6,24 @@ import CartScreen from './CartScreen';
 import ProductDetailScreen from './ProductDetailScreen';
 import NotificationScreen from './NotificationScreen';
 import CheckoutScreen from './CheckoutScreen';
-import { ThemeContext } from '../../App';
+import OrderSuccessScreen from './OrderSuccessScreen';
+import { ThemeContext } from '../theme/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { useIsFocused } from '@react-navigation/native';
 import { getImageSource } from '../utils/imageHelper';
 import { API_URLS } from '../utils/apiConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+// import io from 'socket.io-client'; // Xóa dòng này
 
 const BRANDS = [
-  { name: 'Nike', icon: require('../../assets/img_icon/icon_nike.webp') },
-  { name: 'Puma', icon: require('../../assets/img_icon/icon_puma.jpg') },
-  { name: 'Adidas', icon: require('../../assets/img_icon/icon_adidas.jpg') },
-  { name: 'Vans', icon: require('../../assets/img_icon/icon_vans.jpg') },
+  { name: 'Nike', icon: require('../../assets/img_icon/icon_nike.jpg') },
+  { name: 'Puma', icon: require('../../assets/img_icon/icon_puma.png') },
+  { name: 'Adidas', icon: require('../../assets/img_icon/icon_adidas.png') },
+  { name: 'Vans', icon: require('../../assets/img_icon/icon_vans.webp') },
   { name: 'FILA', icon: require('../../assets/img_icon/icon_fila.png') },
   { name: 'Under ', icon: require('../../assets/img_icon/under-armour-logo.png') },
   { name: 'Red Tape', icon: require('../../assets/img_icon/icon_Red Tape.png') },
-  { name: 'All', isAll: true }, // Không cần icon file, sẽ dùng Ionicons
+  { name: 'All', isAll: true },
 ];
 
 const PRODUCTS = [
@@ -31,7 +34,7 @@ const PRODUCTS = [
     price: 2300,
     oldPrice: 2500,
     rating: 4.5,
-    image: require('../../assets/img_icon/image_giay.png'),
+    image: require('../../assets/img_icon/image_giay.jpg'),
     sizes: [40, 41, 42, 43],
     colors: ['#e53935', '#fbc02d', '#43a047', '#fff'],
     description: 'Giày Puma Black & White cực chất, phù hợp mọi hoạt động.',
@@ -45,7 +48,7 @@ const PRODUCTS = [
     price: 1619,
     oldPrice: 1799,
     rating: 4.7,
-    image: require('../../assets/img_icon/image_giay.png'),
+    image: require('../../assets/img_icon/image_giay.jpg'),
     sizes: [40, 41, 42, 43],
     colors: ['#e53935', '#fbc02d', '#43a047', '#fff'],
     description: 'ADIDAS Classic - thiết kế thể thao, năng động, bền bỉ.',
@@ -59,7 +62,7 @@ const PRODUCTS = [
     price: 1099,
     oldPrice: 1699,
     rating: 4.5,
-    image: require('../../assets/img_icon/image_giay.png'),
+    image: require('../../assets/img_icon/image_giay.jpg'),
     sizes: [40, 41, 42, 43],
     colors: ['#e53935', '#fbc02d', '#43a047', '#fff'],
     description: 'Puma Black - đơn giản, tinh tế, dễ phối đồ.',
@@ -73,7 +76,7 @@ const PRODUCTS = [
     price: 1519,
     oldPrice: 1800,
     rating: 4.9,
-    image: require('../../assets/img_icon/image_giay.png'),
+    image: require('../../assets/img_icon/image_giay.jpg'),
     sizes: [40, 41, 42, 43],
     colors: ['#e53935', '#fbc02d', '#43a047', '#fff'],
     description: 'ADIDAS Solid Active - bền bỉ, mạnh mẽ, dành cho vận động viên.',
@@ -81,6 +84,18 @@ const PRODUCTS = [
     sold: 410,
   },
 ];
+
+// Thêm map tĩnh cho ảnh cục bộ
+const imageMap = {
+  'icon_nike.jpg': require('../../assets/img_icon/icon_nike.jpg'),
+  'icon_adidas.png': require('../../assets/img_icon/icon_adidas.png'),
+  'icon_puma.png': require('../../assets/img_icon/icon_puma.png'),
+  'icon_fila.png': require('../../assets/img_icon/icon_fila.png'),
+  'icon_Red Tape.png': require('../../assets/img_icon/icon_Red Tape.png'),
+  'icon_vans.webp': require('../../assets/img_icon/icon_vans.webp'),
+  'image_giay.jpg': require('../../assets/img_icon/image_giay.jpg'),
+  'under-armour-logo.png': require('../../assets/img_icon/under-armour-logo.png'),
+};
 
 export default function HomeScreen({ navigation }) {
   const { themeColors } = useContext(ThemeContext);
@@ -97,26 +112,72 @@ export default function HomeScreen({ navigation }) {
   const [maxPrice, setMaxPrice] = useState('');
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
+  const [showOrderSuccess, setShowOrderSuccess] = useState(false);
   const isFocused = useIsFocused();
+
+  const fetchCartFromBackend = async () => {
+    const userStr = await AsyncStorage.getItem('user');
+    if (!userStr) return;
+    const user = JSON.parse(userStr);
+    try {
+      const res = await fetch(API_URLS.CART_BY_USER(user.id));
+      let data = await res.json();
+      setCart(data);
+    } catch (e) {
+      Toast.show({ type: 'error', text1: 'Lỗi tải giỏ hàng!' });
+    }
+  };
 
   // Lấy tất cả size và màu có trong products
   const allSizes = Array.from(new Set(products.flatMap(p => p.sizes || [])));
   const allColors = Array.from(new Set(products.flatMap(p => p.colors || [])));
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(API_URLS.PRODUCTS());
-        const data = await res.json();
-        setProducts(data);
-      } catch (e) {
-        Toast.show({ type: 'error', text1: 'Lỗi tải sản phẩm!' });
-      }
-      setLoading(false);
+    console.log('HomeScreen useEffect running');
+    let ws;
+    let reconnectTimeout;
+    function connectWS() {
+      ws = new WebSocket('ws://192.168.1.6:4001');
+      ws.onopen = () => {
+        console.log('WebSocket connected');
+      };
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === 'products_update' && Array.isArray(msg.products)) {
+            setProducts(msg.products);
+            setLoading(false);
+            console.log('Received products from WS:', msg.products);
+          }
+        } catch (e) {
+          console.log('WebSocket message parse error:', e.message);
+        }
+      };
+      ws.onerror = (err) => {
+        console.log('WebSocket error:', err.message);
+      };
+      ws.onclose = () => {
+        console.log('WebSocket closed, reconnecting in 2s...');
+        reconnectTimeout = setTimeout(connectWS, 2000);
+      };
+    }
+    connectWS();
+    return () => {
+      if (ws) ws.close();
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
     };
-    if (isFocused) fetchProducts();
-  }, [isFocused]);
+  }, []);
+
+  useEffect(() => {
+    fetchCartFromBackend();
+  }, []);
+
+  // Khi chuyển sang tab giỏ hàng
+  useEffect(() => {
+    if (activeTab === 'cart') {
+      fetchCartFromBackend();
+    }
+  }, [activeTab]);
 
   // Lọc sản phẩm theo filter
   const filteredProducts = products.filter(product => {
@@ -164,6 +225,20 @@ export default function HomeScreen({ navigation }) {
     setActiveTab('cart');
   };
 
+  // Hàm xóa sản phẩm
+  const deleteProduct = (productId) => {
+    fetch(`http://192.168.1.6:3001/products/${productId}`, {
+      method: 'DELETE',
+    })
+      .then(res => res.json())
+      .then(data => {
+        Toast.show({ type: 'success', text1: 'Đã xóa sản phẩm!' });
+      })
+      .catch(err => {
+        Toast.show({ type: 'error', text1: 'Xóa sản phẩm thất bại!' });
+      });
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }] }>
       {showProductDetail && selectedProduct ? (
@@ -179,13 +254,16 @@ export default function HomeScreen({ navigation }) {
             setShowCheckout(true);
           }}
           themeColors={themeColors}
+          fetchCart={fetchCartFromBackend}
         />
+      ) : showOrderSuccess ? (
+        <OrderSuccessScreen onBack={() => { setShowOrderSuccess(false); setShowCheckout(false); setCart([]); }} themeColors={themeColors} />
       ) : showCheckout ? (
-        <CheckoutScreen onBack={() => setShowCheckout(false)} cart={cart} setCart={setCart} themeColors={themeColors} />
+        <CheckoutScreen onBack={() => setShowCheckout(false)} cart={cart} setCart={setCart} themeColors={themeColors} onOrderSuccess={() => setShowOrderSuccess(true)} fetchCart={fetchCartFromBackend} />
       ) : activeTab === 'user' ? (
         <ProfileScreen onBack={() => setActiveTab('home')} navigation={navigation} themeColors={themeColors} />
       ) : activeTab === 'cart' ? (
-        <CartScreen onBack={() => setActiveTab('home')} cart={cart} setCart={setCart} onCheckout={() => setShowCheckout(true)} themeColors={themeColors} />
+        <CartScreen onBack={() => setActiveTab('home')} cart={cart} setCart={setCart} onCheckout={() => setShowCheckout(true)} themeColors={themeColors} fetchCart={fetchCartFromBackend} />
       ) : activeTab === 'notification' ? (
         <NotificationScreen onBack={() => setActiveTab('home')} themeColors={themeColors} />
       ) : (

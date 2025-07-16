@@ -1,43 +1,32 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { API_URLS } from '../utils/apiConfig';
 
-export default function AddAddressScreen({ onBack, onAdd, themeColors }) {
-  const [address, setAddress] = useState('');
-  const [zip, setZip] = useState('');
+export default function EditAddressScreen({ onBack, address, themeColors, onSave }) {
+  const [detail, setDetail] = useState(address?.detail || '');
+  const [zip, setZip] = useState(address?.zip || '');
   const [loading, setLoading] = useState(false);
 
-  const handleAddAddress = async () => {
-    if (!address || !zip) {
+  const handleSave = async () => {
+    if (!detail || !zip) {
       Toast.show({ type: 'error', text1: 'Vui lòng nhập đầy đủ địa chỉ và mã vùng!' });
       return;
     }
     setLoading(true);
     try {
-      const userStr = await AsyncStorage.getItem('user');
-      if (!userStr) throw new Error('Chưa đăng nhập');
-      const user = JSON.parse(userStr);
-
-      // Gửi địa chỉ mới lên backend
-      const res = await fetch(API_URLS.ADDRESSES(), {
-        method: 'POST',
+      const res = await fetch(API_URLS.ADDRESS_BY_ID(address.id), {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          detail: address,
-          zip: zip,
-          selected: false
-        })
+        body: JSON.stringify({ detail, zip })
       });
-      if (!res.ok) throw new Error('Lỗi thêm địa chỉ!');
-      Toast.show({ type: 'success', text1: 'Đã thêm địa chỉ mới!' });
-      onAdd && onAdd();
+      if (!res.ok) throw new Error('Lỗi cập nhật địa chỉ!');
+      Toast.show({ type: 'success', text1: 'Cập nhật địa chỉ thành công!' });
+      onSave && onSave();
       onBack && onBack();
     } catch (e) {
-      Toast.show({ type: 'error', text1: 'Lỗi thêm địa chỉ!' });
+      Toast.show({ type: 'error', text1: 'Lỗi cập nhật địa chỉ!' });
     }
     setLoading(false);
   };
@@ -49,14 +38,14 @@ export default function AddAddressScreen({ onBack, onAdd, themeColors }) {
       </TouchableOpacity>
       <View style={[styles.container, { backgroundColor: themeColors.background }] }>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: themeColors.text }]}>Thêm mới địa chỉ</Text>
+          <Text style={[styles.title, { color: themeColors.text }]}>Chỉnh sửa địa chỉ</Text>
           <View style={{width:22}} />
         </View>
         <View style={styles.form}>
           <TextInput
             style={[styles.input, { color: themeColors.text, backgroundColor: themeColors.grayLight }]}
-            value={address}
-            onChangeText={setAddress}
+            value={detail}
+            onChangeText={setDetail}
             placeholder="Địa chỉ"
             placeholderTextColor={themeColors.textSecondary}
           />
@@ -70,10 +59,10 @@ export default function AddAddressScreen({ onBack, onAdd, themeColors }) {
         </View>
         <TouchableOpacity
           style={[styles.addBtn, { backgroundColor: themeColors.primary, opacity: loading ? 0.7 : 1 }]}
-          onPress={handleAddAddress}
+          onPress={handleSave}
           disabled={loading}
         >
-          <Text style={styles.addBtnText}>{loading ? 'Đang thêm...' : 'Thêm'}</Text>
+          <Text style={styles.addBtnText}>{loading ? 'Đang lưu...' : 'Lưu'}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -88,4 +77,4 @@ const styles = StyleSheet.create({
   input: { borderRadius: 10, padding: 14, fontSize: 15, marginBottom: 16 },
   addBtn: { borderRadius: 8, paddingVertical: 16, marginHorizontal: 20, marginTop: 24, alignItems: 'center', },
   addBtnText: { color: '#fff', fontSize: 17, fontWeight: 'bold', },
-}); 
+});

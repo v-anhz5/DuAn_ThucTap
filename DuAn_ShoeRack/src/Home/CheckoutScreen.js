@@ -4,10 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
-import { ThemeContext } from '../../App';
+import { ThemeContext } from '../theme/ThemeContext';
 import { API_URLS } from '../utils/apiConfig';
+import AddressListScreen from './AddressListScreen';
 
-export default function CheckoutScreen({ navigation, onBack, cart, setCart, ...props }) {
+export default function CheckoutScreen({ navigation, onBack, cart, setCart, onOrderSuccess, ...props }) {
   const { themeColors } = useContext(ThemeContext);
   const [step, setStep] = useState(1); // 1: Địa chỉ & đơn hàng, 2: Giao hàng, 3: Thanh toán, 4: Xác nhận
   const [shippingMethod, setShippingMethod] = useState('fast');
@@ -15,6 +16,9 @@ export default function CheckoutScreen({ navigation, onBack, cart, setCart, ...p
   const shipping = 100;
   const amount = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   const total = amount + shipping;
+  const [cartSnapshot, setCartSnapshot] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [showAddressList, setShowAddressList] = useState(false);
 
   const updateQty = (id, size, color, delta) => {
     setCart(cart => {
@@ -28,11 +32,26 @@ export default function CheckoutScreen({ navigation, onBack, cart, setCart, ...p
     });
   };
 
+  // Fetch địa chỉ mặc định khi vào CheckoutScreen
   useEffect(() => {
-    if (cart.length === 0) {
+    const fetchDefaultAddress = async () => {
+      const userStr = await AsyncStorage.getItem('user');
+      if (!userStr) return;
+      const user = JSON.parse(userStr);
+      const res = await fetch(`${API_URLS.ADDRESSES_BY_USER(user.id)}`);
+      const data = await res.json();
+      const defaultAddr = data.find(a => a.selected) || data[0] || null;
+      setSelectedAddress(defaultAddr);
+    };
+    fetchDefaultAddress();
+    props.fetchCart && props.fetchCart(); // luôn đồng bộ Order List
+  }, []);
+
+  useEffect(() => {
+    if (cart.length === 0 && step === 1) {
       onBack && onBack();
     }
-  }, [cart]);
+  }, [cart, step]);
 
   const STEP_CONFIG = [
     { icon: 'location-outline', label: 'Địa chỉ' },
@@ -73,27 +92,36 @@ export default function CheckoutScreen({ navigation, onBack, cart, setCart, ...p
   const renderStep1 = () => (
     <>
       {/* Địa chỉ giao hàng */}
-      <View style={[styles.addressBox, { backgroundColor: themeColors.grayLight }] }>
-        <Ionicons name="home" size={22} color={themeColors.primary} style={{marginRight: 10}} />
-        <View style={{flex:1}}>
-          <Text style={[styles.addressLabel, { color: themeColors.text }]}>Nhà</Text>
-          <Text style={[styles.addressDetail, { color: themeColors.textSecondary }]}>Rong even, vn, 35000/kerala</Text>
-        </View>
-        <TouchableOpacity>
+      <TouchableOpacity onPress={() => setShowAddressList(true)}>
+        <View style={[styles.addressBox, { backgroundColor: themeColors.grayLight }] }>
+          <Ionicons name="home" size={22} color={themeColors.primary} style={{marginRight: 10}} />
+          {/* Ô tròn radio button xác nhận địa chỉ */}
+          <Ionicons name={selectedAddress?.selected ? 'radio-button-on' : 'radio-button-off'} size={22} color={themeColors.primary} style={{marginRight: 10}} />
+          <View style={{flex:1}}>
+            <Text style={[styles.addressLabel, { color: themeColors.text }]}>{selectedAddress?.label || 'Chưa có địa chỉ'}</Text>
+            <Text style={[styles.addressDetail, { color: themeColors.textSecondary }]}>{selectedAddress?.detail || ''}</Text>
+          </View>
           <Ionicons name="create-outline" size={20} color={themeColors.primary} />
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
       {/* Danh sách sản phẩm */}
       <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Order List</Text>
       <ScrollView style={styles.orderList}>
         {cart.map((item, idx) => (
           <View key={item.id + '-' + item.size + '-' + item.color + '-' + idx} style={[styles.orderItem, { backgroundColor: themeColors.background, borderColor: themeColors.border, borderWidth: 1 }] }>
-            <Image source={require('../../assets/img_icon/image_giay.png')} style={styles.orderImage} />
+            <Image source={
+              item.image
+                ? (typeof item.image === 'string' && item.image.startsWith('http')
+                    ? { uri: item.image }
+                    : require('../../assets/img_icon/image_giay.jpg'))
+                : require('../../assets/img_icon/image_giay.jpg')
+            } style={styles.orderImage} />
             <View style={{flex:1, marginLeft:10}}>
               <Text style={[styles.orderName, { color: themeColors.text }]}>{item.name}</Text>
               <Text style={[styles.orderDesc, { color: themeColors.textSecondary }]}>{item.desc}</Text>
               <View style={{flexDirection:'row',alignItems:'center',marginTop:2}}>
-                <Text style={[styles.orderMeta, { color: themeColors.textSecondary }]}>White</Text>
+                <View style={{width:18,height:18,borderRadius:9,backgroundColor:item.color,borderWidth:1,borderColor:themeColors.border,marginRight:6}} />
+                <Text style={[styles.orderMeta, { color: themeColors.textSecondary }]}>{item.colorName ? item.colorName : item.color}</Text>
                 <Text style={[styles.orderMeta, { color: themeColors.textSecondary }]}>{`| Size ${item.size}`}</Text>
               </View>
             </View>
@@ -127,6 +155,16 @@ export default function CheckoutScreen({ navigation, onBack, cart, setCart, ...p
       <TouchableOpacity style={[styles.payBtn, { backgroundColor: themeColors.primary }]} onPress={() => setStep(2)}>
         <Text style={styles.payBtnText}>Tiếp tục</Text>
       </TouchableOpacity>
+      {/* Modal chọn địa chỉ */}
+      {showAddressList && (
+        <AddressListScreen
+          onBack={() => setShowAddressList(false)}
+          onAddNew={() => setShowAddressList(false)}
+          themeColors={themeColors}
+          // Khi chọn địa chỉ, cập nhật selectedAddress
+          onSelectAddress={addr => { setSelectedAddress(addr); setShowAddressList(false); }}
+        />
+      )}
     </>
   );
 
@@ -178,9 +216,10 @@ export default function CheckoutScreen({ navigation, onBack, cart, setCart, ...p
         for (const item of cart) {
           await fetch(API_URLS.CART_ITEM(item.id), { method: 'DELETE' });
         }
-        setCart([]);
+        setCartSnapshot(cart); // Lưu lại cart hiện tại nếu cần
         Toast.show({ type: 'success', text1: 'Đặt hàng thành công!' });
-        setStep(4);
+        props.fetchCart && props.fetchCart();
+        onOrderSuccess && onOrderSuccess();
       } else {
         Toast.show({ type: 'error', text1: 'Lỗi đặt hàng!' });
       }
@@ -196,10 +235,6 @@ export default function CheckoutScreen({ navigation, onBack, cart, setCart, ...p
         <Ionicons name="cash" size={24} color={paymentMethod==='cod'?'#fff':themeColors.primary} style={{marginRight: 12}} />
         <Text style={{color:paymentMethod==='cod'?'#fff':themeColors.text,fontWeight:'bold',fontSize:15}}>Thanh toán khi nhận hàng (COD)</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.orderItem, { backgroundColor: paymentMethod==='bank'?themeColors.primary:themeColors.grayLight, borderColor: themeColors.border, borderWidth: 1 }]} onPress={()=>setPaymentMethod('bank')}>
-        <Ionicons name="card" size={24} color={paymentMethod==='bank'?'#fff':themeColors.primary} style={{marginRight: 12}} />
-        <Text style={{color:paymentMethod==='bank'?'#fff':themeColors.text,fontWeight:'bold',fontSize:15}}>Chuyển khoản ngân hàng</Text>
-      </TouchableOpacity>
       <View style={{flexDirection:'row',justifyContent:'space-between',marginTop:32}}>
         <TouchableOpacity style={[styles.payBtn, { backgroundColor: themeColors.gray }]} onPress={() => setStep(2)}>
           <Text style={styles.payBtnText}>Quay lại</Text>
@@ -209,18 +244,6 @@ export default function CheckoutScreen({ navigation, onBack, cart, setCart, ...p
         </TouchableOpacity>
       </View>
     </>
-  );
-
-  // Step 4: Xác nhận đơn hàng
-  const renderStep4 = () => (
-    <View style={{alignItems:'center',justifyContent:'center',flex:1,padding:32}}>
-      <Ionicons name="checkmark-circle" size={64} color={themeColors.primary} style={{marginBottom:16}} />
-      <Text style={{fontSize:22,fontWeight:'bold',color:themeColors.primary,marginBottom:8}}>Đặt hàng thành công!</Text>
-      <Text style={{color:themeColors.textSecondary,fontSize:16,textAlign:'center',marginBottom:24}}>Cảm ơn bạn đã mua sắm tại SHOE RACK. Đơn hàng của bạn sẽ được xử lý và giao trong thời gian sớm nhất.</Text>
-      <TouchableOpacity style={[styles.payBtn, { backgroundColor: themeColors.primary, minWidth:120 }]} onPress={onBack}>
-        <Text style={styles.payBtnText}>Về trang chủ</Text>
-      </TouchableOpacity>
-    </View>
   );
 
   return (
@@ -243,7 +266,6 @@ export default function CheckoutScreen({ navigation, onBack, cart, setCart, ...p
         {step===1 && renderStep1()}
         {step===2 && renderStep2()}
         {step===3 && renderStep3()}
-        {step===4 && renderStep4()}
       </View>
     </View>
   );

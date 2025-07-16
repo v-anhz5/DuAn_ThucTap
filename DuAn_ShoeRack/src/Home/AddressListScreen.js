@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URLS } from '../utils/apiConfig';
+import EditAddressScreen from './EditAddressScreen';
 
 const defaultAddresses = [
   { id: 1, label: 'Home', detail: 'Rong even, vn, 35000/kerala', selected: true },
@@ -12,10 +13,11 @@ const defaultAddresses = [
   { id: 3, label: 'Apartment', detail: 'Rong avenue, 00000/xyz', selected: false },
 ];
 
-export default function AddressListScreen({ onBack, onAddNew, themeColors }) {
+export default function AddressListScreen({ onBack, onAddNew, themeColors, onSelectAddress }) {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
+  const [editingAddress, setEditingAddress] = useState(null);
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -47,6 +49,8 @@ export default function AddressListScreen({ onBack, onAddNew, themeColors }) {
         });
       }
       setAddresses(addr => addr.map(a => ({...a, selected: a.id === id})));
+      const selected = addresses.find(a => a.id === id);
+      onSelectAddress && onSelectAddress(selected);
     } catch (e) {
       Toast.show({ type: 'error', text1: 'Lỗi chọn địa chỉ!' });
     }
@@ -99,7 +103,13 @@ export default function AddressListScreen({ onBack, onAddNew, themeColors }) {
                 <Text style={[styles.addressLabel, { color: themeColors.text }]}>{item.label}</Text>
                 <Text style={[styles.addressDetail, { color: themeColors.textSecondary }]}>{item.detail}</Text>
               </View>
-              <Ionicons name={item.selected ? 'radio-button-on' : 'radio-button-off'} size={22} color={item.selected ? themeColors.primary : themeColors.textSecondary} />
+              {/* Ô tròn radio button để chọn địa chỉ */}
+              <TouchableOpacity onPress={() => selectAddress(item.id)} style={{marginLeft: 10}}>
+                <Ionicons name={item.selected ? 'radio-button-on' : 'radio-button-off'} size={22} color={item.selected ? themeColors.primary : themeColors.textSecondary} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setEditingAddress(item)} style={{marginLeft: 10}}>
+                <Ionicons name="create-outline" size={22} color={themeColors.primary} />
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => removeAddress(item.id)} style={{marginLeft: 10}}>
                 <Ionicons name="trash-outline" size={22} color={themeColors.danger} />
               </TouchableOpacity>
@@ -125,6 +135,29 @@ export default function AddressListScreen({ onBack, onAddNew, themeColors }) {
           <Text style={styles.addBtnText}>Thêm địa chỉ mới</Text>
         </TouchableOpacity>
       </View>
+      {editingAddress && (
+        <EditAddressScreen
+          address={editingAddress}
+          onBack={() => setEditingAddress(null)}
+          themeColors={themeColors}
+          onSave={async () => {
+            setEditingAddress(null);
+            // Fetch lại danh sách địa chỉ
+            const userStr = await AsyncStorage.getItem('user');
+            if (userStr) {
+              const user = JSON.parse(userStr);
+              const res = await fetch(API_URLS.ADDRESSES_BY_USER(user.id));
+              const data = await res.json();
+              setAddresses(data);
+              // Nếu đang ở CheckoutScreen, gọi onSelectAddress với địa chỉ vừa sửa nếu nó đang được chọn
+              if (onSelectAddress && editingAddress) {
+                const updated = data.find(a => a.id === editingAddress.id);
+                if (updated && updated.selected) onSelectAddress(updated);
+              }
+            }
+          }}
+        />
+      )}
     </View>
   );
 }

@@ -31,7 +31,7 @@ export default function OrderDetailScreen({ order, onBack, themeColors }) {
         keyExtractor={(item, idx) => item.productId + '-' + item.size + '-' + item.color + '-' + idx}
         renderItem={({item}) => (
           <View style={[styles.productItem, { backgroundColor: themeColors.grayLight }]}>
-            <Image source={require('../../assets/img_icon/image_giay.png')} style={styles.productImage} />
+            <Image source={require('../../assets/img_icon/image_giay.jpg')} style={styles.productImage} />
             <View style={{flex:1, marginLeft:10}}>
               <Text style={[styles.productName, { color: themeColors.text }]}>{item.name}</Text>
               <Text style={[styles.productDesc, { color: themeColors.textSecondary }]}>{item.desc}</Text>

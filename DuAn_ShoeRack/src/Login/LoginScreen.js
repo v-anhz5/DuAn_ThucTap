@@ -24,6 +24,7 @@ export default function LoginScreen({ navigation, ...props }) {
     }
     setLoading(true);
     try {
+      console.log('LOGIN URL:', API_URLS.USER_BY_EMAIL_PASSWORD(email, password)); // Thêm dòng này để debug URL gọi login
       const res = await fetch(API_URLS.USER_BY_EMAIL_PASSWORD(email, password));
       const users = await res.json();
       if (users.length > 0) {

@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemeContext } from '../../App';
+import { ThemeContext } from '../theme/ThemeContext';
 import EditProfileScreen from './EditProfileScreen';
 import AddressListScreen from './AddressListScreen';
 import AddAddressScreen from './AddAddressScreen';

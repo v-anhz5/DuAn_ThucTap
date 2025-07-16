@@ -11,14 +11,13 @@ export default function RegisterScreen({ navigation, ...props }) {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
   const validatePassword = (pw) => pw.length >= 6;
 
   const handleRegister = async () => {
-    if (!name || !phone || !email || !password || !address) {
+    if (!name || !phone || !email || !password) {
       Toast.show({ type: 'error', text1: 'Vui lòng nhập đầy đủ thông tin!' });
       return;
     }
@@ -44,7 +43,7 @@ export default function RegisterScreen({ navigation, ...props }) {
       const res2 = await fetch(API_URLS.USERS(), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, email, password, address, role: 'customer' })
+        body: JSON.stringify({ name, phone, email, password, role: 'customer' })
       });
       if (res2.ok) {
         setLoading(false);
@@ -88,12 +87,6 @@ export default function RegisterScreen({ navigation, ...props }) {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Địa chỉ"
-            value={address}
-            onChangeText={setAddress}
           />
           <TextInput
             style={styles.input}

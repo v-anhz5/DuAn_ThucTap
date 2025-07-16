@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
-import { ThemeContext } from '../../App';
+import { ThemeContext } from '../theme/ThemeContext';
 
 const notifications = [
   {
@@ -37,7 +37,7 @@ export default function NotificationScreen({ onBack, themeColors }) {
         </View>
         {/* User Info */}
         <View style={styles.userInfo}>
-          <Image source={require('../../assets/img_icon/icon_nike.webp')} style={styles.avatar} />
+          <Image source={require('../../assets/img_icon/icon_nike.jpg')} style={styles.avatar} />
           <View>
             <Text style={[styles.hello, { color: themeColors.textSecondary }]}>Xin chào,</Text>
             <Text style={[styles.username, { color: themeColors.text }]}>Nguyễn Văn A</Text>

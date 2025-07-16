@@ -3,21 +3,19 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, FlatList, 
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
-import { ThemeContext } from '../../App';
+import { ThemeContext } from '../theme/ThemeContext';
 import { processImageArray } from '../utils/imageHelper';
 import { API_URLS } from '../utils/apiConfig';
 
 const imageMap = {
-  'icon_nike.webp': require('../../assets/img_icon/icon_nike.webp'),
-  'icon_puma.jpg': require('../../assets/img_icon/icon_puma.jpg'),
-  'icon_adidas.jpg': require('../../assets/img_icon/icon_adidas.jpg'),
-  'icon_vans.jpg': require('../../assets/img_icon/icon_vans.jpg'),
+  'icon_nike.jpg': require('../../assets/img_icon/icon_nike.jpg'),
+  'icon_adidas.png': require('../../assets/img_icon/icon_adidas.png'),
+  'icon_puma.png': require('../../assets/img_icon/icon_puma.png'),
   'icon_fila.png': require('../../assets/img_icon/icon_fila.png'),
   'icon_Red Tape.png': require('../../assets/img_icon/icon_Red Tape.png'),
-  'icon_under armour.jpg': require('../../assets/img_icon/icon_under armour.jpg'),
-  'image_giay.png': require('../../assets/img_icon/image_giay.png'),
+  'icon_vans.webp': require('../../assets/img_icon/icon_vans.webp'),
+  'image_giay.jpg': require('../../assets/img_icon/image_giay.jpg'),
   'under-armour-logo.png': require('../../assets/img_icon/under-armour-logo.png'),
-  // Thêm các ảnh khác nếu cần
 };
 
 const { width } = Dimensions.get('window');
@@ -238,7 +236,7 @@ export default function ProductDetailScreen({ navigation, route, productId: prop
                         typeof item === 'string'
                           ? (item.startsWith('http')
                               ? { uri: item }
-                              : imageMap[item] || require('../../assets/img_icon/image_giay.png'))
+                              : imageMap[item] || require('../../assets/img_icon/image_giay.jpg'))
                           : item
                       }
                       style={styles.productImage}
@@ -286,7 +284,7 @@ export default function ProductDetailScreen({ navigation, route, productId: prop
                       typeof item === 'string'
                         ? (item.startsWith('http')
                             ? { uri: item }
-                            : imageMap[item] || require('../../assets/img_icon/image_giay.png'))
+                            : imageMap[item] || require('../../assets/img_icon/image_giay.jpg'))
                         : item
                     }
                     style={{ width: width * 0.95, height: width * 0.95, resizeMode: 'contain', marginVertical: 40 }}

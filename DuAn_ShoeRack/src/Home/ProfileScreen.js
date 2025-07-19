@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import OrderHistoryScreen from './OrderHistoryScreen';
 import OrderDetailScreen from './OrderDetailScreen';
 import { API_URLS } from '../utils/apiConfig';
+import { useFocusEffect } from '@react-navigation/native';
 
 function getStyles(themeColors) {
   return StyleSheet.create({
@@ -102,29 +103,58 @@ export default function ProfileScreen({ onBack, navigation, ...props }) {
   const [showTerms, setShowTerms] = useState(false);
   const [showOrderHistory, setShowOrderHistory] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [user, setUser] = useState({ name: 'Muhammed Bilal S', phone: '+84 123456789', email: 'bilal@example.com' });
+  const [user, setUser] = useState(null); // KHÔNG hardcode user mặc định
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const userStr = await AsyncStorage.getItem('user');
-      if (userStr) {
-        setUser(JSON.parse(userStr));
+  // Lấy user từ AsyncStorage, nếu có thì fetch lại từ backend
+  const fetchUser = async () => {
+    const userStr = await AsyncStorage.getItem('user');
+    if (userStr) {
+      const localUser = JSON.parse(userStr);
+      console.log('USER FROM ASYNC:', localUser);
+      try {
+        const res = await fetch(API_URLS.USER_BY_ID(localUser.id));
+        if (res.ok) {
+          const freshUser = await res.json();
+          console.log('USER FROM API:', freshUser);
+          setUser(freshUser);
+          await AsyncStorage.setItem('user', JSON.stringify(freshUser));
+        } else {
+          setUser(localUser);
+        }
+      } catch {
+        setUser(localUser);
       }
-    };
-    fetchUser();
-  }, []);
+    } else {
+      setUser(null);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUser();
+    }, [])
+  );
 
   const styles = getStyles(themeColors);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('user');
+    await AsyncStorage.clear(); // Xóa toàn bộ storage khi đăng xuất
     setShowLogout(false);
-    if (navigation && typeof navigation.replace === 'function') {
-      navigation.replace('Login');
+    if (navigation && typeof navigation.reset === 'function') {
+      navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
     } else if (onBack) {
       onBack();
     }
   };
+
+  if (!user) return (
+    <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+      <Text>Chưa đăng nhập hoặc lỗi tải user!</Text>
+      <TouchableOpacity onPress={handleLogout} style={{marginTop:20, padding:10, backgroundColor:'#3ec6a7', borderRadius:8}}>
+        <Text style={{color:'#fff'}}>Đăng nhập lại</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   if (showEdit) return (
     <EditProfileScreen
@@ -132,7 +162,6 @@ export default function ProfileScreen({ onBack, navigation, ...props }) {
       user={user}
       onSave={async (u) => {
         try {
-          // Gửi lên backend (giả sử user có trường id)
           const res = await fetch(API_URLS.USER_BY_ID(user.id), {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -140,11 +169,10 @@ export default function ProfileScreen({ onBack, navigation, ...props }) {
           });
           if (!res.ok) throw new Error('Lỗi cập nhật backend');
           const updatedUser = await res.json();
-
-          // Lưu FE (AsyncStorage)
           await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
           setUser(updatedUser);
           setShowEdit(false);
+          fetchUser();
         } catch (e) {
           alert('Lỗi cập nhật thông tin!');
         }

@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
   // Base URL cho API server
-  BASE_URL: 'http://192.168.1.6:3001',
+  BASE_URL: 'http://192.168.1.6:4000', // Đúng IP LAN của máy bạn
   
   // Các endpoint chính
   ENDPOINTS: {

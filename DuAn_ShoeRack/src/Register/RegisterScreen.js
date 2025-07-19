@@ -46,9 +46,12 @@ export default function RegisterScreen({ navigation, ...props }) {
         body: JSON.stringify({ name, phone, email, password, role: 'customer' })
       });
       if (res2.ok) {
+        const newUser = await res2.json();
+        console.log('USER REGISTER:', newUser);
+        await AsyncStorage.setItem('user', JSON.stringify(newUser));
         setLoading(false);
-        Toast.show({ type: 'success', text1: '\u0110\u0103ng k\u00fd th\u00e0nh c\u00f4ng!' });
-        navigation.navigate('Login');
+        Toast.show({ type: 'success', text1: 'Đăng ký thành công!' });
+        navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
       } else {
         setLoading(false);
         Toast.show({ type: 'error', text1: 'Lỗi đăng ký!' });

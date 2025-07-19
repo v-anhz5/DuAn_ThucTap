@@ -559,35 +559,45 @@
                             <div class="stat-title">Tổng doanh thu</div>
                             <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">💰</div>
                         </div>
-                        <div class="stat-value">285.7M VND</div>
-                        <div class="stat-change">+12.5% so với tháng trước</div>
+                        <div class="stat-value" id="totalRevenue">0 VND</div>
+                        <div class="stat-change">Tổng doanh thu từ tất cả đơn hàng</div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Đơn hàng hôm nay</div>
-                            <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">📦</div>
+                            <div class="stat-title">Đơn hàng mới</div>
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">🆕</div>
                         </div>
-                        <div class="stat-value">124</div>
-                        <div class="stat-change">+8.2% so với hôm qua</div>
+                        <div class="stat-value" id="newOrders">0</div>
+                        <div class="stat-change">Đơn hàng chờ xử lý</div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Sản phẩm bán chạy</div>
-                            <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🏆</div>
+                            <div class="stat-title">Tổng sản phẩm</div>
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">👟</div>
                         </div>
-                        <div class="stat-value">856</div>
-                        <div class="stat-change">+15.3% so với tuần trước</div>
+                        <div class="stat-value" id="totalProducts">0</div>
+                        <div class="stat-change">Sản phẩm trong hệ thống</div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Khách hàng mới</div>
+                            <div class="stat-title">Tổng khách hàng</div>
                             <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">👥</div>
                         </div>
-                        <div class="stat-value">42</div>
-                        <div class="stat-change">+5.1% so với tuần trước</div>
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-change">Khách hàng đã đăng ký</div>
+                    </div>
+                </div>
+
+                <!-- Thống kê trạng thái đơn hàng -->
+                <div class="content-card" style="margin-top: 20px;">
+                    <div class="card-title">
+                        📊 Thống kê trạng thái đơn hàng
+                    </div>
+                    <div id="orderStatusStats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <!-- Thống kê sẽ được render ở đây -->
                     </div>
                 </div>
 
@@ -734,7 +744,7 @@
                     <div class="card-title">
                         📦 Quản lý đơn hàng
                     </div>
-                    <table class="table">
+                    <table class="table" id="ordersTable">
                         <thead>
                             <tr>
                                 <th>Mã đơn</th>
@@ -746,39 +756,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>#DH001</td>
-                                <td>Nguyễn Văn A</td>
-                                <td>07/07/2025</td>
-                                <td>2.500.000 VND</td>
-                                <td><span class="status-badge status-active">Hoàn thành</span></td>
-                                <td>
-                                    <button class="btn" style="background: #3b82f6; color: white; margin-right: 5px;" onclick="viewOrderDetail('${order.id}')">Xem</button>
-                                    <button class="btn" style="background: #f59e0b; color: white;" onclick="updateOrderStatus('${order.id}', '${order.status}')">Cập nhật</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#DH002</td>
-                                <td>Trần Thị B</td>
-                                <td>06/07/2025</td>
-                                <td>3.200.000 VND</td>
-                                <td><span class="status-badge status-pending">Đang giao</span></td>
-                                <td>
-                                    <button class="btn" style="background: #3b82f6; color: white; margin-right: 5px;" onclick="viewOrderDetail('${order.id}')">Xem</button>
-                                    <button class="btn" style="background: #f59e0b; color: white;" onclick="updateOrderStatus('${order.id}', '${order.status}')">Cập nhật</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#DH003</td>
-                                <td>Lê Văn C</td>
-                                <td>05/07/2025</td>
-                                <td>1.800.000 VND</td>
-                                <td><span class="status-badge status-active">Hoàn thành</span></td>
-                                <td>
-                                    <button class="btn" style="background: #3b82f6; color: white; margin-right: 5px;" onclick="viewOrderDetail('${order.id}')">Xem</button>
-                                    <button class="btn" style="background: #f59e0b; color: white;" onclick="updateOrderStatus('${order.id}', '${order.status}')">Cập nhật</button>
-                                </td>
-                            </tr>
+                            <!-- Dữ liệu đơn hàng sẽ được render ở đây bằng JS -->
                         </tbody>
                     </table>
                 </div>
@@ -1113,7 +1091,7 @@
 
         // Hàm fetch và render danh sách user
         function fetchAndRenderUsers() {
-            fetch('http://192.168.1.6:3001/users')
+            fetch('http://192.168.1.6:4000/users')
                 .then(res => res.json())
                 .then(users => {
                     const tbody = document.querySelector('#userTable tbody');
@@ -1140,7 +1118,7 @@
 
         // ========== CRUD SẢN PHẨM & BIẾN THỂ ========== //
         // API URL
-        const API_URL = 'http://192.168.1.6:3001';
+        const API_URL = 'http://192.168.1.6:4000';
 
         // Hiển thị danh sách sản phẩm
         function fetchAndRenderProducts() {
@@ -1929,28 +1907,120 @@
 
         // ========== CRUD ĐƠN HÀNG ========== //
         function fetchAndRenderOrders() {
-            fetch(`${API_URL}/orders`)
-                .then(res => res.json())
-                .then(orders => {
-                    const tbody = document.querySelector('#ordersTable tbody');
-                    if (!tbody) return;
-                    tbody.innerHTML = '';
-                    orders.forEach(order => {
+            console.log('Fetching orders from:', `${API_URL}/orders`);
+            // Lấy danh sách đơn hàng và users để map thông tin
+            Promise.all([
+                fetch(`${API_URL}/orders`).then(res => {
+                    console.log('Orders response status:', res.status);
+                    return res.json();
+                }),
+                fetch(`${API_URL}/users`).then(res => {
+                    console.log('Users response status:', res.status);
+                    return res.json();
+                })
+            ])
+            .then(([orders, users]) => {
+                console.log('Orders data:', orders);
+                console.log('Users data:', users);
+                const tbody = document.querySelector('#ordersTable tbody');
+                if (!tbody) {
+                    console.error('Orders table tbody not found!');
+                    return;
+                }
+                tbody.innerHTML = '';
+                
+                orders.forEach(order => {
+                        // Tìm thông tin user
+                        const user = users.find(u => u.id === order.userId);
+                        const userName = user ? user.name : `User ${order.userId}`;
+                        
+                        // Tính phí ship
+                        const shippingFee = order.shipping || 0;
+                        const productTotal = order.total - shippingFee;
+                        
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td>#${order.id}</td>
-                            <td>${order.userId}</td>
+                            <td>${userName}</td>
                             <td>${order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : ''}</td>
-                            <td>${order.total ? order.total.toLocaleString() + ' VND' : '-'}</td>
-                            <td><span class="status-badge ${order.status === 'Hoàn thành' ? 'status-active' : order.status === 'Đang giao' ? 'status-pending' : 'status-inactive'}">${order.status}</span></td>
+                            <td>
+                                <div style="font-size: 12px;">
+                                    <div>Hàng: ${productTotal.toLocaleString()} VND</div>
+                                    <div style="color: #666;">Ship: ${shippingFee.toLocaleString()} VND</div>
+                                    <div style="font-weight: bold; color: #667eea;">Tổng: ${order.total ? order.total.toLocaleString() + ' VND' : '-'}</div>
+                                </div>
+                            </td>
+                            <td><span class="status-badge" style="background-color: ${order.statusColor || STATUS_COLORS[order.status] || '#6b7280'}; color: white;">${order.status}</span></td>
                             <td>
                                 <button class="btn" style="background: #3b82f6; color: white; margin-right: 5px;" onclick="viewOrderDetail('${order.id}')">Xem</button>
-                                <button class="btn" style="background: #f59e0b; color: white;" onclick="updateOrderStatus('${order.id}', '${order.status}')">Cập nhật</button>
+                                <button class="btn" style="background: #f59e0b; color: white;" onclick="openUpdateOrderModal('${order.id}', '${order.status}')" ${ORDER_STATUS_FLOW[order.status]?.length === 0 ? 'disabled' : ''}>Cập nhật</button>
                             </td>
                         `;
                         tbody.appendChild(tr);
                     });
+            })
+            .catch(error => {
+                console.error('Error fetching orders:', error);
+                showNotification('Lỗi khi tải danh sách đơn hàng!', 'error');
+            });
+        }
+
+        // Cập nhật thống kê
+        function updateStats() {
+            Promise.all([
+                fetch(`${API_URL}/products`).then(res => res.json()),
+                fetch(`${API_URL}/orders`).then(res => res.json()),
+                fetch(`${API_URL}/users`).then(res => res.json())
+            ]).then(([products, orders, users]) => {
+                document.getElementById('totalProducts').textContent = products.length;
+                document.getElementById('totalUsers').textContent = users.length;
+                
+                // Tính tổng doanh thu
+                const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+                document.getElementById('totalRevenue').textContent = totalRevenue.toLocaleString() + ' VND';
+                
+                // Đếm đơn hàng mới (trạng thái "Chờ xác nhận")
+                const newOrders = orders.filter(order => order.status === 'Chờ xác nhận').length;
+                const newOrdersElement = document.getElementById('newOrders');
+                if (newOrdersElement) {
+                    newOrdersElement.textContent = newOrders;
+                    if (newOrders > 0) {
+                        newOrdersElement.style.color = '#ef4444';
+                        newOrdersElement.style.fontWeight = 'bold';
+                    } else {
+                        newOrdersElement.style.color = '#10b981';
+                    }
+                }
+
+                // Thống kê trạng thái đơn hàng với màu sắc
+                const statusCounts = {};
+                orders.forEach(order => {
+                    statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
                 });
+
+                const orderStatusStatsElement = document.getElementById('orderStatusStats');
+                if (orderStatusStatsElement) {
+                    let statsHtml = '';
+                    Object.keys(STATUS_COLORS).forEach(status => {
+                        const count = statusCounts[status] || 0;
+                        const color = STATUS_COLORS[status];
+                        statsHtml += `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.8); border-radius: 10px; border-left: 4px solid ${color};">
+                                <div>
+                                    <div style="font-weight: bold; color: #333; margin-bottom: 4px;">${status}</div>
+                                    <div style="font-size: 12px; color: #666;">${count} đơn hàng</div>
+                                </div>
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: ${color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px;">
+                                    ${count}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    orderStatusStatsElement.innerHTML = statsHtml;
+                }
+            }).catch(error => {
+                console.error('Error updating stats:', error);
+            });
         }
 
         // Gọi khi vào tab đơn hàng
@@ -1959,49 +2029,228 @@
             orderTab.addEventListener('click', fetchAndRenderOrders);
         }
 
-        // Hàm cập nhật trạng thái đơn hàng
-        function updateOrderStatus(orderId, currentStatus) {
-            const nextStatus = currentStatus === 'Đang xử lý' ? 'Đang giao' : (currentStatus === 'Đang giao' ? 'Hoàn thành' : 'Đang xử lý');
-            if (!confirm(`Chuyển trạng thái đơn hàng #${orderId} sang '${nextStatus}'?`)) return;
-            fetch(`${API_URL}/orders/${orderId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: nextStatus })
-            })
-            .then(res => res.json())
-            .then(() => {
-                showNotification('Đã cập nhật trạng thái đơn hàng!', 'success');
-                fetchAndRenderOrders();
-            });
+        // Load đơn hàng khi trang được load (nếu đang ở tab orders)
+        if (window.location.hash === '#orders') {
+            fetchAndRenderOrders();
+        }
+        
+        // Màu sắc mặc định cho trạng thái
+        let STATUS_COLORS = {
+          'Chờ xác nhận': '#f59e0b',
+          'Chờ lấy hàng': '#6366f1',
+          'Đang giao hàng': '#3b82f6',
+          'Đã giao hàng': '#10b981',
+          'Đã huỷ': '#ef4444'
+        };
+
+        // Lấy màu sắc từ backend
+        async function fetchStatusColors() {
+          try {
+            const response = await fetch(`${API_URL}/order-status-colors`);
+            const colors = await response.json();
+            STATUS_COLORS = { ...STATUS_COLORS, ...colors };
+          } catch (error) {
+            console.log('Không thể lấy màu sắc từ backend, sử dụng màu mặc định');
+          }
         }
 
-        // Hàm xem chi tiết đơn hàng (có thể mở modal hoặc alert)
+        // Cập nhật thống kê khi load trang
+        updateStats();
+        
+        // Lấy màu sắc từ backend
+        fetchStatusColors();
+
+        // Thêm mapping flow trạng thái
+        const ORDER_STATUS_FLOW = {
+          'Chờ xác nhận': [
+            { next: 'Chờ lấy hàng', label: 'Xác nhận' },
+            { next: 'Đã huỷ', label: 'Huỷ đơn' }
+          ],
+          'Chờ lấy hàng': [
+            { next: 'Đang giao hàng', label: 'Đã lấy hàng' },
+            { next: 'Đã huỷ', label: 'Huỷ đơn' }
+          ],
+          'Đang giao hàng': [
+            { next: 'Đã giao hàng', label: 'Đã giao hàng' },
+            { next: 'Đã huỷ', label: 'Huỷ đơn' }
+          ],
+          'Đã giao hàng': [],
+          'Đã huỷ': []
+        };
+
+        // Thêm modal cập nhật trạng thái
+        function openUpdateOrderModal(orderId, currentStatus) {
+          const flow = ORDER_STATUS_FLOW[currentStatus] || [];
+          if (flow.length === 0) {
+            alert('Đơn hàng đã hoàn thành hoặc đã huỷ, không thể cập nhật!');
+            return;
+          }
+          let html = `<div class='modal' id='updateOrderModal' style='display:block;'>
+            <div class='modal-content' style='max-width:400px;'>
+              <span class='close' onclick='document.getElementById("updateOrderModal").remove()'>&times;</span>
+              <h2>Cập nhật trạng thái đơn hàng</h2>
+              <div style='margin:16px 0;'>
+                <b>Trạng thái hiện tại:</b> <span style='background-color: ${STATUS_COLORS[currentStatus] || '#6b7280'}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500;'>${currentStatus}</span>
+              </div>
+              <div style='display:flex;flex-direction:column;gap:12px;'>`;
+          flow.forEach(opt => {
+            const nextStatusColor = STATUS_COLORS[opt.next] || '#6b7280';
+            html += `<button class='btn' style='background:${nextStatusColor};color:#fff;font-weight:bold;' onclick='updateOrderStatusWithValue("${orderId}", "${opt.next}")'>${opt.label}</button>`;
+          });
+          html += `</div></div></div>`;
+          document.body.insertAdjacentHTML('beforeend', html);
+        }
+
+        // Hàm gọi API cập nhật trạng thái
+        function updateOrderStatusWithValue(orderId, nextStatus) {
+          if (!confirm(`Chuyển trạng thái đơn hàng #${orderId} sang '${nextStatus}'?`)) return;
+          fetch(`${API_URL}/orders/${orderId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: nextStatus })
+          })
+          .then(res => res.json())
+          .then(() => {
+            showNotification('Đã cập nhật trạng thái đơn hàng!', 'success');
+            fetchAndRenderOrders();
+            document.getElementById('updateOrderModal')?.remove();
+          });
+        }
+
+        // Hàm xem chi tiết đơn hàng
         function viewOrderDetail(orderId) {
-            fetch(`${API_URL}/orders`)
-                .then(res => res.json())
-                .then(orders => {
-                    const order = orders.find(o => o.id == orderId);
-                    if (!order) return alert('Không tìm thấy đơn hàng!');
-                    alert(JSON.stringify(order, null, 2));
-                });
+            Promise.all([
+                fetch(`${API_URL}/orders`).then(res => res.json()),
+                fetch(`${API_URL}/users`).then(res => res.json())
+            ])
+            .then(([orders, users]) => {
+                const order = orders.find(o => o.id == orderId);
+                if (!order) {
+                    showNotification('Không tìm thấy đơn hàng!', 'error');
+                    return;
+                }
+                
+                const user = users.find(u => u.id === order.userId);
+                const userName = user ? user.name : `User ${order.userId}`;
+                
+                // Tạo modal hiển thị chi tiết đơn hàng
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.display = 'block';
+                
+                let itemsHtml = '';
+                if (order.items && order.items.length > 0) {
+                    // Map màu sắc
+                    const colorMap = {
+                        'đen': '#000000',
+                        'trắng': '#ffffff',
+                        'đỏ': '#ff0000',
+                        'xanh dương': '#0000ff',
+                        'vàng': '#ffff00',
+                        'xanh lá': '#00ff00',
+                        'cam': '#ffa500'
+                    };
+                    
+                    itemsHtml = order.items.map(item => {
+                        const colorHex = colorMap[item.color] || '#ccc';
+                        const imageUrl = item.image || 'https://via.placeholder.com/60x60?text=No+Image';
+                        
+                        return `
+                            <div style="border: 1px solid #ddd; padding: 15px; margin: 8px 0; border-radius: 12px; background: #fff;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <img src="${imageUrl}" alt="${item.name}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid #eee;">
+                                    <div style="flex: 1;">
+                                        <h4 style="margin: 0 0 8px 0; color: #333;">${item.name}</h4>
+                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                            <div style="display: flex; align-items: center; gap: 5px;">
+                                                <div style="width: 20px; height: 20px; border-radius: 50%; background-color: ${colorHex}; border: 2px solid #ddd;"></div>
+                                                <span style="font-weight: bold; color: #666;">${item.color}</span>
+                                            </div>
+                                            <span style="color: #666;">|</span>
+                                            <span style="font-weight: bold; color: #666;">Size ${item.size}</span>
+                                            <span style="color: #666;">|</span>
+                                            <span style="font-weight: bold; color: #666;">SL: ${item.qty}</span>
+                                        </div>
+                                        <div style="font-size: 16px; font-weight: bold; color: #667eea;">
+                                            ${item.price ? item.price.toLocaleString() + ' VND' : '-'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 700px;">
+                        <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                        <h2>Chi tiết đơn hàng #${order.id}</h2>
+                        <div style="margin: 20px 0;">
+                            <p><strong>Khách hàng:</strong> ${userName}</p>
+                            <p><strong>Ngày đặt:</strong> ${order.createdAt ? new Date(order.createdAt).toLocaleString('vi-VN') : '-'}</p>
+                            <p><strong>Trạng thái:</strong> <span class="status-badge" style="background-color: ${order.statusColor || STATUS_COLORS[order.status] || '#6b7280'}; color: white;">${order.status}</span></p>
+                            <p><strong>Phương thức giao hàng:</strong> ${order.shippingMethod || '-'}</p>
+                            <p><strong>Phương thức thanh toán:</strong> ${order.paymentMethod || '-'}</p>
+                            <p><strong>Địa chỉ giao hàng:</strong> ${order.address === 'Chưa xác định' ? '<span style="color:#ef4444">Chưa xác định (đơn cũ)</span>' : (order.address || '<span style="color:#ef4444">Chưa có thông tin</span>')}</p>
+                            <p><strong>Phí giao hàng:</strong> ${(order.shipping === 0 ? '<span style="color:#ef4444">0 VND (đơn cũ)</span>' : (order.shipping != null ? order.shipping.toLocaleString() + ' VND' : '<span style=\'color:#ef4444\'>Chưa có thông tin</span>'))}</p>
+                        </div>
+                        <div>
+                            <h3>Sản phẩm:</h3>
+                            ${itemsHtml || '<p>Không có sản phẩm</p>'}
+                        </div>
+                        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                            <h4>Chi tiết thanh toán:</h4>
+                            <p><strong>Tiền hàng:</strong> ${(order.total && order.shipping != null ? (order.total - order.shipping).toLocaleString() : '-')} VND</p>
+                            <p><strong>Phí giao hàng:</strong> ${(order.shipping != null ? order.shipping.toLocaleString() : '<span style=\'color:#ef4444\'>Chưa có thông tin</span>')} VND</p>
+                            <p><strong>Tổng cộng:</strong> <strong style="color: #667eea; font-size: 18px;">${order.total ? order.total.toLocaleString() + ' VND' : '-'}</strong></p>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+            })
+            .catch(error => {
+                console.error('Error fetching order details:', error);
+                showNotification('Lỗi khi tải chi tiết đơn hàng!', 'error');
+            });
         }
 
         // Lắng nghe WebSocket để realtime cập nhật trạng thái đơn hàng
         (function listenOrderWebSocket() {
             try {
-                const ws = new WebSocket('ws://192.168.1.6:4001');
+                const ws = new WebSocket('ws://192.168.1.6:4000');
                 ws.onmessage = function(event) {
                     const data = JSON.parse(event.data);
+                    console.log('Admin WebSocket message:', data);
                     if (data.type === 'order_update') {
                         fetchAndRenderOrders();
-                        showNotification('Đơn hàng #' + data.order.id + ' đã được cập nhật trạng thái!', 'success');
+                        updateStats(); // Cập nhật thống kê khi có thay đổi
+                        showNotification('Đơn hàng #' + data.order.id + ' đã được cập nhật trạng thái: ' + data.order.status, 'success');
+                    } else if (data.type === 'new_order') {
+                        fetchAndRenderOrders();
+                        updateStats();
+                        showNotification('🆕 Có đơn hàng mới #' + data.order.id + ' từ ' + data.customerName + '!', 'success');
                     }
                 };
-                ws.onopen = function() { console.log('WebSocket kết nối realtime đơn hàng!'); };
-                ws.onerror = function() { console.log('WebSocket lỗi!'); };
-                ws.onclose = function() { setTimeout(listenOrderWebSocket, 3000); };
-            } catch (e) { setTimeout(listenOrderWebSocket, 3000); }
+                ws.onopen = function() { console.log('Admin WebSocket kết nối realtime đơn hàng!'); };
+                ws.onerror = function(error) { console.log('Admin WebSocket lỗi:', error); };
+                ws.onclose = function() { 
+                    console.log('Admin WebSocket đã đóng, thử kết nối lại...');
+                    setTimeout(listenOrderWebSocket, 3000); 
+                };
+            } catch (e) { 
+                console.log('Admin WebSocket error:', e);
+                setTimeout(listenOrderWebSocket, 3000); 
+            }
         })();
+        
+        // Tự động refresh danh sách đơn hàng mỗi 30 giây
+        setInterval(() => {
+            const ordersSection = document.getElementById('orders');
+            if (ordersSection && ordersSection.style.display !== 'none') {
+                fetchAndRenderOrders();
+            }
+        }, 30000);
     </script>
 </body>
 </html>

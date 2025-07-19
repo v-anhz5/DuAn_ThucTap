@@ -26,11 +26,14 @@ export default function AddressListScreen({ onBack, onAddNew, themeColors, onSel
       if (!userStr) return;
       const user = JSON.parse(userStr);
       setUserId(user.id);
+      console.log('DEBUG ADDRESS LIST - USER ID:', user.id);
       try {
         const res = await fetch(API_URLS.ADDRESSES_BY_USER(user.id));
         const data = await res.json();
+        console.log('DEBUG ADDRESS LIST - FETCHED ADDRESSES:', data);
         setAddresses(data);
       } catch (e) {
+        console.error('DEBUG ADDRESS LIST - FETCH ERROR:', e);
         Toast.show({ type: 'error', text1: 'Lỗi tải địa chỉ!' });
       }
       setLoading(false);
@@ -58,6 +61,8 @@ export default function AddressListScreen({ onBack, onAddNew, themeColors, onSel
 
   const addAddress = async (label, detail) => {
     try {
+      console.log('DEBUG ADD ADDRESS - USER ID:', userId);
+      console.log('DEBUG ADD ADDRESS - DATA:', { userId, label, detail, selected: false });
       const res = await fetch(API_URLS.ADDRESSES(), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,10 +70,12 @@ export default function AddressListScreen({ onBack, onAddNew, themeColors, onSel
       });
       if (res.ok) {
         const newAddr = await res.json();
+        console.log('DEBUG ADD ADDRESS - NEW ADDRESS:', newAddr);
         setAddresses(addr => [...addr, newAddr]);
         Toast.show({ type: 'success', text1: 'Đã thêm địa chỉ!' });
       }
     } catch (e) {
+      console.error('DEBUG ADD ADDRESS - ERROR:', e);
       Toast.show({ type: 'error', text1: 'Lỗi thêm địa chỉ!' });
     }
   };

@@ -28,10 +28,14 @@ export default function LoginScreen({ navigation, ...props }) {
       const res = await fetch(API_URLS.USER_BY_EMAIL_PASSWORD(email, password));
       const users = await res.json();
       if (users.length > 0) {
+        console.log('USER LOGIN:', users[0]);
         await AsyncStorage.setItem('user', JSON.stringify(users[0]));
         setLoading(false);
         Toast.show({ type: 'success', text1: 'Đăng nhập thành công!' });
-        navigation.navigate('Home');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
       } else {
         setLoading(false);
         Toast.show({ type: 'error', text1: 'Email hoặc mật khẩu không đúng!' });

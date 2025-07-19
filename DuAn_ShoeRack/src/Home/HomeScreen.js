@@ -133,39 +133,17 @@ export default function HomeScreen({ navigation }) {
   const allColors = Array.from(new Set(products.flatMap(p => p.colors || [])));
 
   useEffect(() => {
-    console.log('HomeScreen useEffect running');
-    let ws;
-    let reconnectTimeout;
-    function connectWS() {
-      ws = new WebSocket('ws://192.168.1.6:4001');
-      ws.onopen = () => {
-        console.log('WebSocket connected');
-      };
-      ws.onmessage = (event) => {
-        try {
-          const msg = JSON.parse(event.data);
-          if (msg.type === 'products_update' && Array.isArray(msg.products)) {
-            setProducts(msg.products);
-            setLoading(false);
-            console.log('Received products from WS:', msg.products);
-          }
-        } catch (e) {
-          console.log('WebSocket message parse error:', e.message);
-        }
-      };
-      ws.onerror = (err) => {
-        console.log('WebSocket error:', err.message);
-      };
-      ws.onclose = () => {
-        console.log('WebSocket closed, reconnecting in 2s...');
-        reconnectTimeout = setTimeout(connectWS, 2000);
-      };
-    }
-    connectWS();
-    return () => {
-      if (ws) ws.close();
-      if (reconnectTimeout) clearTimeout(reconnectTimeout);
-    };
+    setLoading(true);
+    fetch(API_URLS.PRODUCTS())
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.error('Lỗi fetch sản phẩm:', err);
+      });
   }, []);
 
   useEffect(() => {
@@ -227,7 +205,7 @@ export default function HomeScreen({ navigation }) {
 
   // Hàm xóa sản phẩm
   const deleteProduct = (productId) => {
-    fetch(`http://192.168.1.6:3001/products/${productId}`, {
+    fetch(`http://192.168.1.6:4000/products/${productId}`, {
       method: 'DELETE',
     })
       .then(res => res.json())
@@ -246,7 +224,7 @@ export default function HomeScreen({ navigation }) {
           onBack={() => setShowProductDetail(false)}
           addToCart={addToCart}
           product={selectedProduct}
-          productId={selectedProduct.productId}
+          productId={selectedProduct.id} // Sửa lại: truyền đúng product.id
           onCheckoutProduct={(product, size, color) => {
             if (!size || !color) return;
             setShowProductDetail(false);
@@ -484,42 +462,43 @@ export default function HomeScreen({ navigation }) {
               </View>
             )
           }
-          renderItem={({ item: product }) => (
+          renderItem={({ item }) => (
             <TouchableOpacity
               style={[styles.productCard, { backgroundColor: themeColors.grayLight }]}
               activeOpacity={0.8}
               onPress={() => {
-                setSelectedProduct({ ...product, productId: product.id });
+                console.log('OPEN PRODUCT DETAIL, productId:', item.id);
+                setSelectedProduct(item);
                 setShowProductDetail(true);
               }}
             >
               <View style={styles.imageWrapper}>
                 <Image 
-                  source={getImageSource(product.image)}
+                  source={getImageSource(item.image)}
                   style={styles.productImage} 
                 />
-                {product.discount > 0 && (
+                {item.discount > 0 && (
                   <View style={styles.saleTag}>
-                    <Text style={styles.saleTagText}>{`-${product.discount}%`}</Text>
+                    <Text style={styles.saleTagText}>{`-${item.discount}%`}</Text>
                   </View>
                 )}
               </View>
               <View style={styles.productInfo}>
                 <Text style={[styles.productName, { color: themeColors.text }]} numberOfLines={2}>
-                  {product.name}
+                  {item.name}
                 </Text>
                 <View style={styles.ratingContainer}>
                   <View style={styles.ratingRow}>
                     <Ionicons name="star" size={14} color="#FFD700" />
-                    <Text style={styles.rating}>{product.rating}</Text>
+                    <Text style={styles.rating}>{item.rating}</Text>
                   </View>
                   <Text style={styles.reviewCount}>(150+)</Text>
                 </View>
                 <View style={styles.priceRowWrap}>
                   <View style={styles.priceBoxLeftClean}>
-                    <Text style={[styles.priceCurrentClean, { color: themeColors.primary }]}>{product.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Text>
-                    {product.oldPrice && (
-                      <Text style={styles.priceOldClean}>{product.oldPrice?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Text>
+                    <Text style={[styles.priceCurrentClean, { color: themeColors.primary }]}>{item.price?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Text>
+                    {item.oldPrice && (
+                      <Text style={styles.priceOldClean}>{item.oldPrice?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Text>
                     )}
                   </View>
                 </View>

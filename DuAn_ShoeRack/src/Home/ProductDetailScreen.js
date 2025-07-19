@@ -43,7 +43,23 @@ export default function ProductDetailScreen({ navigation, route, productId: prop
         .then(data => setProduct(data));
       fetch(API_URLS.VARIANTS_BY_PRODUCT(productId))
         .then(res => res.json())
-        .then(data => setVariants(data));
+        .then(data => {
+          // Chuyển đổi mã màu hex sang tên màu
+          const colorNameMap = {
+            '#000000': 'đen',
+            '#ffffff': 'trắng',
+            '#ff0000': 'đỏ',
+            '#0000ff': 'xanh dương',
+            '#ffff00': 'vàng',
+            '#00ff00': 'xanh lá',
+            '#ffa500': 'cam'
+          };
+          const normalizedVariants = data.map(v => ({
+            ...v,
+            color: (colorNameMap[v.color?.toLowerCase()] || v.color || '').toLowerCase().trim()
+          }));
+          setVariants(normalizedVariants);
+        });
     }
   }, [productId]);
 
@@ -143,50 +159,66 @@ export default function ProductDetailScreen({ navigation, route, productId: prop
       const userStr = await AsyncStorage.getItem('user');
       if (!userStr) throw new Error('Chưa đăng nhập');
       const user = JSON.parse(userStr);
-      // Lấy giá và ảnh biến thể đã chọn
-      let variant = variants.find(v => v.size === selectedSize && v.color === selectedColor);
+      let variant = variants.find(v => v.size === selectedSize && v.color === selectedColor.toLowerCase().trim());
       let price = variant ? variant.price : product.price;
-      // Lấy ảnh đại diện (ưu tiên ảnh đầu tiên trong mảng images, hoặc product.image)
       let image = null;
       if (product.images && product.images.length > 0) {
         image = product.images[0];
       } else if (product.image) {
         image = product.image;
       }
-      // Kiểm tra đã có sản phẩm này trong giỏ chưa
-      const res = await fetch(API_URLS.CART_BY_USER_PRODUCT(user.id, product.id, selectedSize, selectedColor));
+      const normColor = selectedColor.toLowerCase().trim();
+      // Thêm log chi tiết để debug
+      console.log('DEBUG ADD TO CART:', {
+        userId: user.id,
+        productId: product.id,
+        name: product.name,
+        size: selectedSize,
+        color: normColor,
+        qty: 1,
+        price: price
+      });
+      const checkUrl = API_URLS.CART_BY_USER_PRODUCT(user.id, product.id, selectedSize, normColor);
+      console.log('DEBUG CHECK URL:', checkUrl);
+      const res = await fetch(checkUrl);
       const items = await res.json();
+      console.log('DEBUG CHECK CART RESPONSE:', items);
       if (items.length > 0) {
-        // Đã có, PATCH tăng qty
         const item = items[0];
-        await fetch(API_URLS.CART_ITEM(item.id), {
+        const patchRes = await fetch(API_URLS.CART_ITEM(item.id), {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ qty: item.qty + 1 })
         });
+        const patchData = await patchRes.json();
+        console.log('DEBUG PATCH CART RESPONSE:', patchData);
       } else {
-        // Thêm mới
-        await fetch(API_URLS.CART_BY_USER(), {
+        const cartData = {
+          userId: user.id,
+          productId: product.id,
+          name: product.name,
+          desc: product.desc,
+          image: image,
+          size: selectedSize,
+          color: normColor,
+          qty: 1,
+          price: price
+        };
+        console.log('DEBUG CREATING NEW CART DATA:', cartData);
+        const postRes = await fetch(API_URLS.CART_BY_USER(), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: user.id,
-            productId: product.id,
-            name: product.name,
-            desc: product.desc,
-            image: image,
-            size: selectedSize,
-            color: selectedColor,
-            qty: 1,
-            price: price
-          })
+          body: JSON.stringify(cartData)
         });
+        const postData = await postRes.json();
+        console.log('DEBUG POST CART RESPONSE:', postData);
       }
       Toast.show({
         type: 'success',
         text1: 'Đã thêm vào giỏ hàng!',
       });
     } catch (e) {
+      console.log('DEBUG ADD TO CART ERROR:', e);
       Toast.show({ type: 'error', text1: 'Lỗi thêm vào giỏ hàng!' });
     }
   };
@@ -372,14 +404,14 @@ export default function ProductDetailScreen({ navigation, route, productId: prop
               <Text style={[styles.selectionLabel, { color: contextThemeColors.text }]}>Chọn màu</Text>
               <View style={styles.colorContainer}>
                 {colors.map(colorObj => {
-                  const color = colorObj.code.toLowerCase().trim();
+                  const color = colorObj.name.toLowerCase().trim();
                   const isAvailable = enabledColors.includes(color);
                   return (
                     <TouchableOpacity
                       key={color}
                       style={[
                         styles.colorButton,
-                        { backgroundColor: color },
+                        { backgroundColor: colorObj.code },
                         selectedColor === color && isAvailable && styles.colorButtonActive,
                         !isAvailable && styles.colorButtonDisabled
                       ]}

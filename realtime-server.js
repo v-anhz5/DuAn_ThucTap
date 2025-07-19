@@ -134,10 +134,10 @@ async function readProducts() {
 }
 
 // Gửi event cho tất cả client khi có thay đổi
-function broadcastProducts() {
-  // This function is no longer needed as products are managed by MongoDB
-  // const products = readProducts();
-  // io.emit('products_update', products);
+async function broadcastProducts() {
+  let products = await readProducts();
+  if (!Array.isArray(products)) products = [];
+  io.emit('products_update', products);
 }
 
 // Đã loại bỏ hoàn toàn mọi đoạn code thao tác với db.json và fs
@@ -331,9 +331,8 @@ app.post('/products', async (req, res) => {
   try {
     const newProduct = new Product({ ...req.body, id: Date.now().toString() });
     await newProduct.save();
-    // Broadcast cập nhật sản phẩm mới
-  broadcastProducts();
-  res.json(newProduct);
+    await broadcastProducts();
+    res.json(newProduct);
   } catch (err) {
     res.status(500).json({ error: 'Lỗi thêm sản phẩm vào MongoDB' });
   }
@@ -342,10 +341,15 @@ app.post('/products', async (req, res) => {
 // API sửa sản phẩm
 app.patch('/products/:id', async (req, res) => {
   try {
-    await Product.updateOne({ id: req.params.id }, { $set: req.body });
-    broadcastProducts();
-    res.json({ success: true });
+    console.log('PATCH PRODUCT', req.params.id, req.body);
+    const updateResult = await Product.updateOne({ id: req.params.id }, { $set: req.body });
+    console.log('PATCH PRODUCT updateOne result:', updateResult);
+    const updatedProduct = await Product.findOne({ id: req.params.id });
+    console.log('PATCH PRODUCT after update:', updatedProduct);
+    await broadcastProducts();
+    res.json({ success: true, updatedProduct });
   } catch (err) {
+    console.error('PATCH PRODUCT ERROR:', err);
     res.status(500).json({ error: 'Lỗi cập nhật sản phẩm trong MongoDB' });
   }
 });
@@ -354,7 +358,7 @@ app.patch('/products/:id', async (req, res) => {
 app.delete('/products/:id', async (req, res) => {
   try {
     await Product.deleteOne({ id: req.params.id });
-    broadcastProducts();
+    await broadcastProducts();
     console.log('Đã xóa sản phẩm với id:', req.params.id); // Thêm log xác nhận xóa
     res.json({ success: true });
   } catch (err) {

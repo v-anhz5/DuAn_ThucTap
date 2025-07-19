@@ -1318,7 +1318,7 @@
                 };
                 if (product.id) {
                     fetch(`${API_URL}/products/${product.id}`, {
-                        method: 'PUT',
+                        method: 'PATCH', // Đổi từ PUT sang PATCH để backend nhận được
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ ...product, ...data })
                     }).then(() => {

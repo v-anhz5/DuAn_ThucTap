@@ -11,7 +11,8 @@ export const API_CONFIG = {
     CART: '/cart',
     ORDERS: '/orders',
     ADDRESSES: '/addresses',
-    DB: '/db'
+    DB: '/db',
+    NOTIFICATIONS: '/notifications'
   }
 };
 
@@ -69,5 +70,6 @@ export const API_URLS = {
   ADDRESS_BY_ID: (id) => createApiUrlWithId(API_CONFIG.ENDPOINTS.ADDRESSES, id),
   
   // Database
-  DB: () => createApiUrl(API_CONFIG.ENDPOINTS.DB)
+  DB: () => createApiUrl(API_CONFIG.ENDPOINTS.DB),
+  NOTIFICATIONS_BY_USER: (userId) => createApiUrl(API_CONFIG.ENDPOINTS.NOTIFICATIONS, { userId })
 }; 

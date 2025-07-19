@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, ActivityIndicator, FlatList, Dimensions } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfileScreen from './ProfileScreen';
 import CartScreen from './CartScreen';
@@ -13,6 +13,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { getImageSource } from '../utils/imageHelper';
 import { API_URLS } from '../utils/apiConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRef } from 'react';
 
 const BRANDS = [
   { name: 'Nike', icon: require('../../assets/img_icon/icon_nike.jpg') },
@@ -112,6 +113,12 @@ export default function HomeScreen({ navigation }) {
   const [selectedColor, setSelectedColor] = useState(null);
   const [showOrderSuccess, setShowOrderSuccess] = useState(false);
   const isFocused = useIsFocused();
+  const [bannerIndex, setBannerIndex] = useState(0);
+  const bannerScrollRef = useRef();
+  const { width } = Dimensions.get('window');
+  const BANNER_WIDTH = Math.round(width * 0.9);
+  const bannerHeight = 120;
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchCartFromBackend = async () => {
     const userStr = await AsyncStorage.getItem('user');
@@ -123,6 +130,23 @@ export default function HomeScreen({ navigation }) {
       setCart(data);
     } catch (e) {
       Toast.show({ type: 'error', text1: 'Lỗi tải giỏ hàng!' });
+    }
+  };
+
+  const fetchUnreadCount = async () => {
+    const userStr = await AsyncStorage.getItem('user');
+    if (!userStr) {
+      setUnreadCount(0);
+      return;
+    }
+    const user = JSON.parse(userStr);
+    try {
+      const res = await fetch(API_URLS.NOTIFICATIONS_BY_USER(user.id));
+      const data = await res.json();
+      const unread = Array.isArray(data) ? data.filter(n => !n.read).length : 0;
+      setUnreadCount(unread);
+    } catch {
+      setUnreadCount(0);
     }
   };
 
@@ -148,10 +172,24 @@ export default function HomeScreen({ navigation }) {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'cart') {
-      fetchCartFromBackend();
-    }
+    fetchUnreadCount();
   }, [activeTab]);
+
+  // Tự động chuyển slide
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nextIndex = (bannerIndex + 1) % banners.length;
+      setBannerIndex(nextIndex);
+      bannerScrollRef.current?.scrollTo({ x: nextIndex * BANNER_WIDTH, animated: true });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [bannerIndex]);
+
+  // Lắng nghe notification realtime và cập nhật unreadCount
+  useEffect(() => {
+    // Giả sử bạn có thể lấy notifications từ NotificationScreen hoặc fetch lại ở đây
+    // Để đơn giản, thêm prop onUnreadCountChange vào NotificationScreen
+  }, []);
 
   const filteredProducts = products.filter(product => {
     if (selectedBrand && product.brand !== selectedBrand) return false;
@@ -221,6 +259,27 @@ export default function HomeScreen({ navigation }) {
     </View>
   );
 
+  const banners = [
+    {
+      title: '25% Today Special',
+      desc: 'Get discount for every order, only valid today',
+      img: 'https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/7b6e2e2e-2e2e-4e2e-8e2e-2e2e2e2e2e2e/air-max-90-shoe.png',
+      bg: themeColors.primary
+    },
+    {
+      title: 'FREESHIP toàn quốc',
+      desc: 'Miễn phí vận chuyển cho đơn từ 500K',
+      img: 'https://pngimg.com/d/shoes_PNG5746.png',
+      bg: '#43e97b'
+    },
+    {
+      title: 'Mua 1 tặng 1',
+      desc: 'Chỉ áp dụng cho Adidas & Puma',
+      img: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308', // <-- Link ảnh mẫu hoạt động tốt
+      bg: '#fff'
+    }
+  ];
+
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
       {showProductDetail && selectedProduct ? (
@@ -243,11 +302,11 @@ export default function HomeScreen({ navigation }) {
       ) : showCheckout ? (
         <CheckoutScreen onBack={() => setShowCheckout(false)} cart={cart} setCart={setCart} themeColors={themeColors} onOrderSuccess={() => setShowOrderSuccess(true)} fetchCart={fetchCartFromBackend} />
       ) : activeTab === 'user' ? (
-        <ProfileScreen onBack={() => setActiveTab('home')} navigation={navigation} themeColors={themeColors} />
+        <ProfileScreen onBack={() => setActiveTab('home')} navigation={navigation} themeColors={themeColors} onUnreadCountChange={setUnreadCount} />
       ) : activeTab === 'cart' ? (
         <CartScreen onBack={() => setActiveTab('home')} cart={cart} setCart={setCart} onCheckout={() => setShowCheckout(true)} themeColors={themeColors} fetchCart={fetchCartFromBackend} />
       ) : activeTab === 'notification' ? (
-        <NotificationScreen onBack={() => setActiveTab('home')} themeColors={themeColors} />
+        <NotificationScreen onBack={() => setActiveTab('home')} onUnreadCountChange={setUnreadCount} />
       ) : (
         <FlatList
           data={loading ? [] : filteredProducts}
@@ -326,21 +385,71 @@ export default function HomeScreen({ navigation }) {
                   ))}
                 </View>
               </ScrollView>
-              <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={styles.bannerContainer}>
-                {[
-                  { title: '25% Today Special', desc: 'Get discount for every order, only valid today', img: 'https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/7b6e2e2e-2e2e-4e2e-8e2e-2e2e2e2e2e2e/air-max-90-shoe.png', bg: themeColors.primary },
-                  { title: 'FREESHIP toàn quốc', desc: 'Miễn phí vận chuyển cho đơn từ 500K', img: 'https://pngimg.com/d/shoes_PNG5746.png', bg: '#43e97b' },
-                  { title: 'Mua 1 tặng 1', desc: 'Chỉ áp dụng cho Adidas & Puma', img: 'https://pngimg.com/d/running_shoes_PNG5816.png', bg: '#fff' },
-                ].map((banner, idx) => (
-                  <View key={idx} style={[styles.banner, { backgroundColor: banner.bg }]}>
-                    <View style={styles.bannerText}>
+              {/* Banner Carousel */}
+              <ScrollView
+                ref={bannerScrollRef}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onMomentumScrollEnd={e => {
+                  const idx = Math.round(e.nativeEvent.contentOffset.x / BANNER_WIDTH);
+                  setBannerIndex(idx);
+                }}
+                style={{ marginBottom: 12, marginTop: 10 }}
+                contentContainerStyle={{ paddingHorizontal: (width - BANNER_WIDTH) / 2 }}
+              >
+                {banners.map((banner, idx) => (
+                  <View
+                    key={idx}
+                    style={[
+                      styles.banner,
+                      {
+                        backgroundColor: banner.bg,
+                        width: BANNER_WIDTH,
+                        height: bannerHeight,
+                        marginRight: idx < banners.length - 1 ? 12 : 0,
+                        marginLeft: idx === 0 ? 0 : 0,
+                        shadowColor: '#000',
+                        shadowOpacity: 0.08,
+                        shadowRadius: 8,
+                        shadowOffset: { width: 0, height: 2 },
+                        elevation: 2,
+                        padding: 0,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        borderRadius: 16,
+                      },
+                    ]}
+                  >
+                    {idx === 2 ? (
+                      <Image
+                        source={{ uri: banner.img }}
+                        style={{
+                          position: 'absolute',
+                          top: 0, left: 0,
+                          width: BANNER_WIDTH,
+                          height: bannerHeight,
+                          borderRadius: 16,
+                          resizeMode: 'cover',
+                        }}
+                      />
+                    ) : null}
+                    <View style={{ flex: 1, zIndex: 1, padding: 16 }}>
                       <Text style={styles.bannerTitle}>{banner.title}</Text>
                       <Text style={styles.bannerDesc}>{banner.desc}</Text>
                     </View>
-                    <Image source={{ uri: banner.img }} style={styles.bannerImage} />
+                    {idx !== 2 && (
+                      <Image source={{ uri: banner.img }} style={styles.bannerImage} />
+                    )}
                   </View>
                 ))}
               </ScrollView>
+              {/* Dot indicator */}
+              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
+                {banners.map((_, idx) => (
+                  <View key={idx} style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: bannerIndex === idx ? themeColors.primary : '#ccc', marginHorizontal: 3 }} />
+                ))}
+              </View>
               {(() => {
                 let brandsToShow = [...BRANDS];
                 while (brandsToShow.length < 8) brandsToShow.push({ name: '', isEmpty: true });
@@ -468,9 +577,20 @@ export default function HomeScreen({ navigation }) {
             <Ionicons name={activeTab === 'cart' ? 'cart' : 'cart-outline'} size={26} color={activeTab === 'cart' ? themeColors.primary : themeColors.text} />
             <Text style={[styles.navLabel, activeTab === 'cart' && styles.navLabelActive]}>Giỏ hàng</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.navItem, activeTab === 'notification' && styles.navItemActive]} onPress={() => setActiveTab('notification')}>
-            <Ionicons name={activeTab === 'notification' ? 'notifications' : 'notifications-outline'} size={26} color={activeTab === 'notification' ? themeColors.primary : themeColors.text} />
-            <Text style={[styles.navLabel, activeTab === 'notification' && styles.navLabelActive]}>Thông báo</Text>
+          <TouchableOpacity style={activeTab === 'notification' ? styles.navItemActive : styles.navItem} onPress={() => setActiveTab('notification')}>
+            <View style={{ position: 'relative' }}>
+              <Ionicons name={activeTab === 'notification' ? 'notifications' : 'notifications-outline'} size={26} color={activeTab === 'notification' ? themeColors.primary : themeColors.text} />
+              {unreadCount > 0 && (
+                <View style={{
+                  position: 'absolute', top: -4, right: -8,
+                  backgroundColor: '#ff5252', borderRadius: 8, minWidth: 16, height: 16,
+                  alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4
+                }}>
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: 'bold' }}>{unreadCount}</Text>
+                </View>
+              )}
+            </View>
+            <Text style={activeTab === 'notification' ? styles.navLabelActive : styles.navLabel}>Thông báo</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.navItem, activeTab === 'user' && styles.navItemActive]} onPress={() => setActiveTab('user')}>
             <Ionicons name={activeTab === 'user' ? 'person' : 'person-outline'} size={26} color={activeTab === 'user' ? themeColors.primary : themeColors.text} />

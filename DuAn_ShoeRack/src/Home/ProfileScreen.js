@@ -10,6 +10,7 @@ import OrderHistoryScreen from './OrderHistoryScreen';
 import OrderDetailScreen from './OrderDetailScreen';
 import { API_URLS } from '../utils/apiConfig';
 import { useFocusEffect } from '@react-navigation/native';
+import NotificationScreen from './NotificationScreen';
 
 function getStyles(themeColors) {
   return StyleSheet.create({
@@ -93,8 +94,8 @@ function getStyles(themeColors) {
   });
 }
 
-export default function ProfileScreen({ onBack, navigation, ...props }) {
-  const { themeColors, toggleTheme, theme } = useContext(ThemeContext);
+export default function ProfileScreen({ onBack, navigation, themeColors, onUnreadCountChange }) {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const [showEdit, setShowEdit] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
   const [showAddAddress, setShowAddAddress] = useState(false);
@@ -104,6 +105,8 @@ export default function ProfileScreen({ onBack, navigation, ...props }) {
   const [showOrderHistory, setShowOrderHistory] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [user, setUser] = useState(null); // KHÔNG hardcode user mặc định
+  const [showNotification, setShowNotification] = useState(false); // Thêm state để mở NotificationScreen từ Profile
+  const [unreadCount, setUnreadCount] = useState(0); // State badge thông báo
 
   // Lấy user từ AsyncStorage, nếu có thì fetch lại từ backend
   const fetchUser = async () => {
@@ -184,6 +187,12 @@ export default function ProfileScreen({ onBack, navigation, ...props }) {
   if (showAddAddress) return <AddAddressScreen onBack={() => setShowAddAddress(false)} onAdd={() => setShowAddAddress(false)} themeColors={themeColors} />;
   if (showOrderHistory && !selectedOrder) return <OrderHistoryScreen onBack={() => setShowOrderHistory(false)} onSelectOrder={order => setSelectedOrder(order)} themeColors={themeColors} />;
   if (selectedOrder) return <OrderDetailScreen order={selectedOrder} onBack={() => setSelectedOrder(null)} themeColors={themeColors} />;
+  if (showNotification) return (
+    <NotificationScreen onBack={() => setShowNotification(false)} onUnreadCountChange={count => {
+      setUnreadCount(count);
+      if (typeof onUnreadCountChange === 'function') onUnreadCountChange(count);
+    }} />
+  );
 
   return (
     <View style={{flex:1}}>
@@ -213,7 +222,15 @@ export default function ProfileScreen({ onBack, navigation, ...props }) {
           <View style={[styles.menuList, { backgroundColor: themeColors.background, shadowColor: themeColors.shadow }] }>
             <MenuItem icon="create-outline" label="Chỉnh sửa trang cá nhân" onPress={() => setShowEdit(true)} themeColors={themeColors} styles={styles} />
             <MenuItem icon="location-outline" label="Địa chỉ" onPress={() => setShowAddress(true)} themeColors={themeColors} styles={styles} />
-            <MenuItem icon="notifications-outline" label="Thông báo" themeColors={themeColors} styles={styles} />
+            <TouchableOpacity onPress={() => setShowNotification(true)} style={{flexDirection:'row',alignItems:'center',paddingVertical:14,paddingHorizontal:20}}>
+              <Ionicons name="notifications-outline" size={22} color={themeColors.primary} style={{marginRight:14}} />
+              <Text style={{fontSize:16,color:themeColors.text,flex:1}}>Thông báo</Text>
+              {unreadCount > 0 && (
+                <View style={{backgroundColor:'#ff5252',borderRadius:8,minWidth:18,height:18,alignItems:'center',justifyContent:'center',paddingHorizontal:5,marginLeft:6}}>
+                  <Text style={{color:'#fff',fontSize:12,fontWeight:'bold'}}>{unreadCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
             <MenuItem icon="moon-outline" label={theme === 'dark' ? 'Chế độ sáng' : 'Chế độ tối'} onPress={toggleTheme} themeColors={themeColors} styles={styles} />
             <MenuItem icon="shield-checkmark-outline" label="Chính sách bảo mật" onPress={() => setShowPrivacy(true)} themeColors={themeColors} styles={styles} />
             <MenuItem icon="document-text-outline" label="Điều khoản & Điều kiện" onPress={() => setShowTerms(true)} themeColors={themeColors} styles={styles} />

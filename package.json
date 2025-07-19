@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node realtime-server.js",
     "migrate": "node migrate-dbjson-to-mongo.js"
+ 
   },
   "devDependencies": {
     "json-server": "^0.17.0"

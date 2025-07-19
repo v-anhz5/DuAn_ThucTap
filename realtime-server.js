@@ -58,16 +58,18 @@ const ORDER_STATUSES = [
   'Chờ lấy hàng',
   'Đang giao hàng',
   'Đã giao hàng',
+  'Đã nhận hàng', // Thêm trạng thái mới
   'Đã huỷ'
 ];
 
 // Mapping màu sắc cho từng trạng thái đơn hàng
 const STATUS_COLORS = {
   'Chờ xác nhận': '#f59e0b',    // Màu cam
-  'Chờ lấy hàng': '#6366f1',    // Màu tím
-  'Đang giao hàng': '#3b82f6',  // Màu xanh dương
-  'Đã giao hàng': '#10b981',    // Màu xanh lá
-  'Đã huỷ': '#ef4444'           // Màu đỏ
+  'Chờ lấy hàng': '#6366f1',    // Màu tím nhạt
+  'Đang giao hàng': '#f97316',  // Màu cam đậm
+  'Đã giao hàng': '#3b82f6',    // Xanh nước biển nhạt
+  'Đã nhận hàng': '#10b981',    // Xanh lá
+  'Đã huỷ': '#ef4444'           // Đỏ
 };
 
 const orderSchema = new mongoose.Schema({
@@ -127,6 +129,17 @@ const variantSchema = new mongoose.Schema({
   stock: Number
 });
 const Variant = mongoose.model('Variant', variantSchema);
+
+// Định nghĩa schema/model cho Notification
+const notificationSchema = new mongoose.Schema({
+  id: String,
+  userId: String, // null hoặc undefined nếu là thông báo chung
+  title: String,
+  content: String,
+  createdAt: String,
+  read: { type: Boolean, default: false }
+});
+const Notification = mongoose.model('Notification', notificationSchema);
 
 // Đọc danh sách sản phẩm từ MongoDB
 async function readProducts() {
@@ -231,6 +244,18 @@ app.get('/orders', async (req, res) => {
   }
 });
 
+// API lấy danh sách đơn hàng chia nhóm
+app.get('/orders/grouped', async (req, res) => {
+  try {
+    let orders = await Order.find({});
+    const completed = orders.filter(o => o.status === 'Đã giao hàng');
+    const others = orders.filter(o => o.status !== 'Đã giao hàng');
+    res.json({ completed, others });
+  } catch (err) {
+    res.status(500).json({ error: 'Lỗi lấy orders grouped từ MongoDB' });
+  }
+});
+
 // API lấy danh sách cart
 app.get('/cart', async (req, res) => {
   try {
@@ -326,12 +351,92 @@ app.get('/order-status-colors', (req, res) => {
   }
 });
 
+// API lấy danh sách notification
+app.get('/notifications', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    let notifications;
+    if (userId) {
+      notifications = await Notification.find({ $or: [ { userId }, { userId: null } ] });
+    } else {
+      notifications = await Notification.find({ userId: null });
+    }
+    res.json(notifications);
+  } catch (err) {
+    res.status(500).json({ error: 'Lỗi lấy notifications từ MongoDB' });
+  }
+});
+// API thêm notification
+app.post('/notifications', async (req, res) => {
+  try {
+    const newNotification = new Notification({
+      ...req.body,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      read: false
+    });
+    await newNotification.save();
+    // Emit realtime cho userId nếu có
+    if (newNotification.userId) {
+      io.to(newNotification.userId).emit('notification', newNotification);
+    } else {
+      io.emit('notification', newNotification); // Thông báo chung
+    }
+    res.json(newNotification);
+  } catch (err) {
+    res.status(500).json({ error: 'Lỗi thêm notification vào MongoDB' });
+  }
+});
+
+// Đánh dấu đã đọc notification
+app.patch('/notifications/:id', async (req, res) => {
+  try {
+    await Notification.updateOne({ id: req.params.id }, { $set: { read: true } });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Lỗi đánh dấu đã đọc notification' });
+  }
+});
+// Xóa notification
+app.delete('/notifications/:id', async (req, res) => {
+  try {
+    await Notification.deleteOne({ id: req.params.id });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Lỗi xóa notification' });
+  }
+});
+
+// Helper gửi notification
+async function sendNotification({ userId, title, content }) {
+  console.log('SEND NOTIFICATION:', { userId, title, content });
+  const newNotification = new Notification({
+    id: Date.now().toString(),
+    userId: userId || null,
+    title,
+    content,
+    createdAt: new Date().toISOString(),
+    read: false
+  });
+  await newNotification.save();
+  if (userId) {
+    io.to(userId).emit('notification', newNotification);
+  } else {
+    io.emit('notification', newNotification);
+  }
+}
+
 // API thêm sản phẩm
 app.post('/products', async (req, res) => {
   try {
     const newProduct = new Product({ ...req.body, id: Date.now().toString() });
     await newProduct.save();
     await broadcastProducts();
+    // Gửi notification chung cho tất cả user
+    await sendNotification({
+      title: 'Sản phẩm mới',
+      content: `Sản phẩm ${newProduct.name} vừa được thêm mới! Khám phá ngay!`
+    });
     res.json(newProduct);
   } catch (err) {
     res.status(500).json({ error: 'Lỗi thêm sản phẩm vào MongoDB' });
@@ -382,6 +487,12 @@ app.patch('/users/:id', async (req, res) => {
   try {
     await User.updateOne({ id: req.params.id }, { $set: req.body });
     const updatedUser = await User.findOne({ id: req.params.id });
+    // Gửi notification cho user khi cập nhật profile
+    await sendNotification({
+      userId: req.params.id,
+      title: 'Cập nhật thông tin cá nhân',
+      content: 'Thông tin cá nhân của bạn đã được cập nhật thành công.'
+    });
     res.json(updatedUser);
   } catch (err) {
     res.status(500).json({ error: 'Lỗi cập nhật user trong MongoDB' });
@@ -412,6 +523,13 @@ app.post('/orders', async (req, res) => {
       history: [{ status, time: now, by: req.body.userId || 'user', reason: '' }]
     });
     await newOrder.save();
+    console.log('DEBUG ORDER USERID:', req.body.userId);
+    // Gửi notification cho user đặt hàng
+    await sendNotification({
+      userId: req.body.userId,
+      title: 'Đặt hàng thành công',
+      content: `Đơn hàng của bạn đã được đặt thành công. Cảm ơn bạn đã mua sắm tại SHOERACK!`
+    });
     
     // Gửi thông báo realtime cho admin về đơn hàng mới
     try {
@@ -445,7 +563,8 @@ const ORDER_STATUS_FLOW = {
   'Chờ xác nhận': ['Chờ lấy hàng', 'Đã huỷ'],
   'Chờ lấy hàng': ['Đang giao hàng', 'Đã huỷ'],
   'Đang giao hàng': ['Đã giao hàng', 'Đã huỷ'],
-  'Đã giao hàng': [],
+  'Đã giao hàng': ['Đã nhận hàng'], // Cho phép chuyển sang Đã nhận hàng
+  'Đã nhận hàng': [],
   'Đã huỷ': []
 };
 
@@ -473,6 +592,13 @@ app.patch('/orders/:id', async (req, res) => {
       order.history.push({ status: update.status, time: now, by, reason });
       if (update.cancelReason) order.cancelReason = update.cancelReason;
       await order.save();
+      console.log('DEBUG PATCH ORDER USERID:', order.userId);
+      // Gửi notification cho user khi trạng thái đơn hàng thay đổi
+      await sendNotification({
+        userId: order.userId,
+        title: 'Cập nhật trạng thái đơn hàng',
+        content: `Đơn hàng #${order.id} của bạn đã được cập nhật trạng thái: ${update.status}`
+      });
       // Cập nhật các trường khác nếu có
       await Order.updateOne({ id: req.params.id }, { $set: update });
     } else {
@@ -657,9 +783,38 @@ app.delete('/variants/:id', async (req, res) => {
   }
 });
 
+// API lấy danh sách tồn kho (inventory)
+app.get('/inventory', async (req, res) => {
+  try {
+    // Lấy tất cả variants (biến thể sản phẩm)
+    const variants = await Variant.find({});
+    // Lấy thông tin sản phẩm để map tên
+    const products = await Product.find({});
+    const productMap = {};
+    products.forEach(p => { productMap[p.id] = p.name; });
+
+    const inventory = variants.map(v => ({
+      productName: productMap[v.productId] || 'Unknown',
+      sku: v.id,
+      color: v.color,
+      size: v.size,
+      quantity: v.stock,
+      status: v.stock > 0 ? (v.stock < 5 ? 'Low Stock' : 'In Stock') : 'Out of Stock'
+    }));
+
+    res.json(inventory);
+  } catch (err) {
+    res.status(500).json({ error: 'Lỗi lấy inventory từ MongoDB' });
+  }
+});
+
 // Khi client kết nối
 io.on('connection', (socket) => {
   socket.emit('products_update', readProducts());
+  // Lắng nghe join room theo userId để gửi notification riêng
+  socket.on('join', (userId) => {
+    if (userId) socket.join(userId);
+  });
 });
 
 const PORT = 4000;

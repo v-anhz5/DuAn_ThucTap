@@ -24,4 +24,28 @@ async function updateOldOrderStatuses() {
   process.exit();
 }
 
-updateOldOrderStatuses(); 
+async function fixOrderCreatedAtFormat() {
+  const orders = await Order.find({});
+  let updated = 0;
+  for (const order of orders) {
+    let newCreatedAt = order.createdAt;
+    // Nếu là số (timestamp)
+    if (typeof newCreatedAt === 'number') {
+      newCreatedAt = new Date(newCreatedAt).toISOString();
+    }
+    // Nếu là chuỗi nhưng không phải ISO
+    else if (typeof newCreatedAt === 'string' && !/^\d{4}-\d{2}-\d{2}T/.test(newCreatedAt)) {
+      const d = new Date(newCreatedAt);
+      if (!isNaN(d.getTime())) newCreatedAt = d.toISOString();
+    }
+    if (newCreatedAt !== order.createdAt) {
+      await Order.updateOne({ id: order.id }, { $set: { createdAt: newCreatedAt } });
+      updated++;
+    }
+  }
+  console.log('Đã cập nhật', updated, 'đơn hàng về đúng định dạng createdAt ISO.');
+  process.exit();
+}
+
+updateOldOrderStatuses();
+fixOrderCreatedAtFormat(); 

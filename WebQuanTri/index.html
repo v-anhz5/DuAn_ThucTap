@@ -784,10 +784,11 @@
             </div>
 
             <div id="analytics" class="section" style="display: none;">
-                <div class="content-card">
-                    <div class="card-title">📈 Thống kê & Báo cáo</div>
-                    <p>Biểu đồ thống kê và báo cáo sẽ được hiển thị ở đây...</p>
-                </div>
+              <div class="content-card">
+                <div class="card-title">📈 Thống kê & Báo cáo</div>
+                <canvas id="revenueChart" height="120"></canvas>
+                <div id="topProducts" style="margin-top:32px;"></div>
+              </div>
             </div>
 
             <div id="inventory" class="section" style="display: none;">
@@ -796,51 +797,31 @@
                     <button class="btn btn-primary" onclick="openInventoryEditModal()">+ Nhập/Xuất kho</button>
                     <table class="table" id="inventoryTable">
                         <thead>
-                            <tr>
-                                <th>Sản phẩm</th>
-                                <th>Mã SKU</th>
-                                <th>Màu</th>
-                                <th>Size</th>
-                                <th>Số lượng</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
+                            <tr><th>Sản phẩm</th><th>Mã SKU</th><th>Màu</th><th>Size</th><th>Số lượng</th><th>Trạng thái</th><th>Thao tác</th></tr>
                         </thead>
-                        <tbody>
-                            <!-- Dữ liệu tồn kho sẽ được render ở đây bằng JS -->
-                        </tbody>
+                        <tbody></tbody>
                     </table>
+                    <div id="inventoryLog" style="margin-top:32px;"></div>
                 </div>
-                <!-- Modal chỉnh sửa tồn kho -->
-                <div id="inventoryEditModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close" onclick="closeModal('inventoryEditModal')">&times;</span>
-                        <h2>Chỉnh sửa tồn kho</h2>
-                        <form id="inventoryEditForm">
-                            <div class="form-group">
-                                <label class="form-label">Sản phẩm</label>
-                                <input type="text" id="editProductName" class="form-input" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Mã SKU</label>
-                                <input type="text" id="editSKU" class="form-input" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Màu</label>
-                                <input type="text" id="editColor" class="form-input" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Size</label>
-                                <input type="text" id="editSize" class="form-input" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Số lượng tồn kho</label>
-                                <input type="number" id="editQuantity" class="form-input" min="0" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-                        </form>
-                    </div>
-                </div>
+            </div>
+            <!-- Modal nhập/xuất kho -->
+            <div id="inventoryEditModal" class="modal">
+              <div class="modal-content" style="max-width:400px;">
+                <span class="close" onclick="closeModal('inventoryEditModal')">&times;</span>
+                <h2 id="inventoryEditTitle">Nhập/Xuất kho</h2>
+                <form id="inventoryEditForm">
+                  <input type="hidden" name="sku">
+                  <div class="form-group"><label class="form-label">Số lượng</label><input type="number" class="form-input" name="qty" required></div>
+                  <div class="form-group"><label class="form-label">Lý do</label><input type="text" class="form-input" name="reason" required></div>
+                  <div class="form-group"><label class="form-label">Loại</label>
+                    <select class="form-input" name="type">
+                      <option value="in">Nhập kho</option>
+                      <option value="out">Xuất kho</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </form>
+              </div>
             </div>
 
             <div id="banners" class="section" style="display: none;">
@@ -855,10 +836,25 @@
             </div>
 
             <div id="settings" class="section" style="display: none;">
-                <div class="content-card">
-                    <div class="card-title">⚙️ Cài đặt hệ thống</div>
-                    <p>Các tùy chọn cài đặt sẽ được hiển thị ở đây...</p>
-                </div>
+              <div class="content-card">
+                <div class="card-title">⚙️ Cài đặt hệ thống</div>
+                <form id="storeInfoForm" style="margin-bottom:32px;">
+                  <h3 style="margin-bottom:12px;">Thông tin cửa hàng</h3>
+                  <div class="form-group"><label class="form-label">Tên cửa hàng</label><input type="text" class="form-input" name="storeName" required></div>
+                  <div class="form-group"><label class="form-label">Địa chỉ</label><input type="text" class="form-input" name="storeAddress" required></div>
+                  <div class="form-group"><label class="form-label">Hotline</label><input type="text" class="form-input" name="storeHotline" required></div>
+                  <div class="form-group"><label class="form-label">Logo (URL)</label><input type="text" class="form-input" name="storeLogo"></div>
+                  <div class="form-group"><label class="form-label">Phí ship mặc định (VND)</label><input type="number" class="form-input" name="defaultShipping" required></div>
+                  <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+                </form>
+                <form id="changePasswordForm">
+                  <h3 style="margin-bottom:12px;">Đổi mật khẩu admin</h3>
+                  <div class="form-group"><label class="form-label">Mật khẩu cũ</label><input type="password" class="form-input" name="oldPassword" required></div>
+                  <div class="form-group"><label class="form-label">Mật khẩu mới</label><input type="password" class="form-input" name="newPassword" required></div>
+                  <div class="form-group"><label class="form-label">Xác nhận mật khẩu mới</label><input type="password" class="form-input" name="confirmPassword" required></div>
+                  <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
+                </form>
+              </div>
             </div>
             <!-- Notifications Section -->
             <div id="notifications" class="section" style="display: none;">
@@ -945,6 +941,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Navigation
         function showSection(sectionId) {
@@ -1020,6 +1017,8 @@
                     }, 100);
                 }, index * 100);
             });
+            // Hiển thị luôn biểu đồ thống kê khi vào trang
+            fetchAndRenderAnalytics();
         });
 
         // Real-time clock
@@ -1807,103 +1806,57 @@
                     tbody.innerHTML = '';
                     inventory.forEach(item => {
                         const tr = document.createElement('tr');
+                        const lowStock = item.quantity < 5 ? 'color:#ef4444;font-weight:bold;' : '';
                         tr.innerHTML = `
                             <td>${item.productName}</td>
                             <td>${item.sku}</td>
                             <td>${item.color}</td>
                             <td>${item.size}</td>
-                            <td>${item.quantity}</td>
+                            <td style="${lowStock}">${item.quantity}</td>
                             <td><span class="status-badge ${item.status === 'In Stock' ? 'status-active' : item.status === 'Out of Stock' ? 'status-pending' : 'status-inactive'}">${item.status}</span></td>
                             <td>
-                                <button class="btn" style="background:#10b981;color:white;" onclick="openInventoryEditModal(${item.id})">Sửa</button>
-                                <button class="btn" style="background:#ef4444;color:white;" onclick="deleteInventory(${item.id})">Xóa</button>
+                                <button class="btn" style="background:#10b981;color:white;" onclick="openInventoryEditModal('${item.sku}')">Nhập/Xuất kho</button>
                             </td>
                         `;
                         tbody.appendChild(tr);
                     });
+                    renderInventoryLog();
                 });
         }
 
-        document.querySelector('a[href="#inventory"]').addEventListener('click', fetchAndRenderInventory);
-
-        function openInventoryEditModal(id) {
-            fetch(`${API_URL}/inventory/${id}`)
-                .then(res => res.json())
-                .then(item => {
-                    document.getElementById('editProductName').value = item.productName;
-                    document.getElementById('editSKU').value = item.sku;
-                    document.getElementById('editColor').value = item.color;
-                    document.getElementById('editSize').value = item.size;
-                    document.getElementById('editQuantity').value = item.quantity;
-                    document.getElementById('inventoryEditModal').style.display = 'block';
-                });
+        function openInventoryEditModal(sku) {
+          document.getElementById('inventoryEditModal').style.display = 'block';
+          const form = document.getElementById('inventoryEditForm');
+          form.reset();
+          form.sku.value = sku || '';
         }
 
-        function deleteInventory(id) {
-            if (!confirm('Bạn có chắc muốn xóa mục này?')) return;
-            fetch(`${API_URL}/inventory/${id}`, { method: 'DELETE' })
-                .then(() => {
-                    fetchAndRenderInventory();
-                    showNotification('Đã xóa mục!', 'success');
-                });
+        document.getElementById('inventoryEditForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const data = Object.fromEntries(new FormData(this).entries());
+          // Lưu log vào localStorage (demo)
+          const log = JSON.parse(localStorage.getItem('inventoryLog') || '[]');
+          log.push({ ...data, time: new Date().toLocaleString() });
+          localStorage.setItem('inventoryLog', JSON.stringify(log));
+          showNotification('Đã ghi nhận thao tác kho!', 'success');
+          closeModal('inventoryEditModal');
+          renderInventoryLog();
+        });
+
+        function renderInventoryLog() {
+          const log = JSON.parse(localStorage.getItem('inventoryLog') || '[]');
+          let html = '<h3 style="margin-bottom:12px;">Lịch sử nhập/xuất kho</h3><table class="table"><thead><tr><th>SKU</th><th>Loại</th><th>Số lượng</th><th>Lý do</th><th>Thời gian</th></tr></thead><tbody>';
+          log.slice(-20).reverse().forEach(entry => {
+            html += `<tr><td>${entry.sku}</td><td>${entry.type === 'in' ? 'Nhập' : 'Xuất'}</td><td>${entry.qty}</td><td>${entry.reason}</td><td>${entry.time}</td></tr>`;
+          });
+          html += '</tbody></table>';
+          document.getElementById('inventoryLog').innerHTML = html;
         }
 
-        document.getElementById('inventoryEditForm').onsubmit = function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const data = {
-                productName: form.productName.value,
-                sku: form.sku.value,
-                color: form.color.value,
-                size: form.size.value,
-                quantity: Number(form.quantity.value),
-                status: form.status.value
-            };
-            const id = form.dataset.id;
-            if (id) {
-                fetch(`${API_URL}/inventory/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(() => {
-                    closeModal('inventoryEditModal');
-                    fetchAndRenderInventory();
-                    showNotification('Đã cập nhật mục!', 'success');
-                })
-                .catch(error => {
-                    console.error('Error updating inventory:', error);
-                    showNotification('Lỗi khi cập nhật mục!', 'error');
-                });
-            } else {
-                fetch(`${API_URL}/inventory`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(() => {
-                    closeModal('inventoryEditModal');
-                    fetchAndRenderInventory();
-                    showNotification('Đã thêm mục!', 'success');
-                })
-                .catch(error => {
-                    console.error('Error adding inventory:', error);
-                    showNotification('Lỗi khi thêm mục!', 'error');
-                });
-            }
-        };
+        const inventoryTab = document.querySelector('a[href="#inventory"]');
+        if (inventoryTab) {
+          inventoryTab.addEventListener('click', fetchAndRenderInventory);
+        }
 
         // ========== CRUD ĐƠN HÀNG ========== //
         function fetchAndRenderOrders() {
@@ -2251,6 +2204,116 @@
                 fetchAndRenderOrders();
             }
         }, 30000);
+
+        function renderRevenueChart(months, revenues) {
+          const ctx = document.getElementById('revenueChart').getContext('2d');
+          if (window.revenueChartInstance) window.revenueChartInstance.destroy();
+          window.revenueChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: months,
+              datasets: [{
+                label: 'Doanh thu (VND)',
+                data: revenues,
+                backgroundColor: '#3b82f6',
+                borderRadius: 8,
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Doanh thu 12 tháng gần nhất', font: { size: 18 } }
+              },
+              scales: {
+                y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() + ' ₫' } }
+              }
+            }
+          });
+        }
+
+        function fetchAndRenderAnalytics() {
+          fetch('http://192.168.1.6:4000/orders')
+            .then(res => res.json())
+            .then(orders => {
+              // Tổng hợp doanh thu theo tháng
+              const now = new Date();
+              const months = [];
+              const revenues = [];
+              for (let i = 11; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const label = d.toLocaleString('vi-VN', { month: 'short', year: '2-digit' });
+                months.push(label);
+                const monthStr = d.toISOString().slice(0,7); // yyyy-mm
+                const monthRevenue = orders.filter(o => o.createdAt && o.createdAt.startsWith(monthStr)).reduce((sum, o) => sum + (o.total || 0), 0);
+                revenues.push(monthRevenue);
+              }
+              renderRevenueChart(months, revenues);
+              // Top sản phẩm bán chạy
+              const productMap = {};
+              orders.forEach(o => (o.items||[]).forEach(item => {
+                if (!productMap[item.name]) productMap[item.name] = 0;
+                productMap[item.name] += item.qty || 1;
+              }));
+              const topProducts = Object.entries(productMap).sort((a,b) => b[1]-a[1]).slice(0,5);
+              let html = '<h3 style="margin-bottom:12px;">Top 5 sản phẩm bán chạy</h3><ol>';
+              topProducts.forEach(([name, qty]) => {
+                html += `<li style="margin-bottom:6px;">${name} <b style="color:#3b82f6">(${qty} đôi)</b></li>`;
+              });
+              html += '</ol>';
+              document.getElementById('topProducts').innerHTML = html;
+            });
+        }
+        const analyticsTab = document.querySelector('a[href="#analytics"]');
+        if (analyticsTab) {
+          analyticsTab.addEventListener('click', fetchAndRenderAnalytics);
+        }
+
+        // Cài đặt: Lưu thông tin cửa hàng vào localStorage (demo)
+        document.getElementById('storeInfoForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const data = Object.fromEntries(new FormData(this).entries());
+          localStorage.setItem('storeInfo', JSON.stringify(data));
+          showNotification('Đã lưu thông tin cửa hàng!', 'success');
+        });
+        // Load lại khi vào tab
+        const settingsTab = document.querySelector('a[href="#settings"]');
+        if (settingsTab) {
+          settingsTab.addEventListener('click', function() {
+            const data = JSON.parse(localStorage.getItem('storeInfo') || '{}');
+            const form = document.getElementById('storeInfoForm');
+            if (form) {
+              form.storeName.value = data.storeName || '';
+              form.storeAddress.value = data.storeAddress || '';
+              form.storeHotline.value = data.storeHotline || '';
+              form.storeLogo.value = data.storeLogo || '';
+              form.defaultShipping.value = data.defaultShipping || '';
+            }
+          });
+        }
+        // Đổi mật khẩu admin (demo, chỉ kiểm tra local)
+        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const oldPass = this.oldPassword.value;
+          const newPass = this.newPassword.value;
+          const confirmPass = this.confirmPassword.value;
+          const adminPass = localStorage.getItem('adminPass') || 'admin123';
+          if (oldPass !== adminPass) {
+            showNotification('Mật khẩu cũ không đúng!', 'error');
+            return;
+          }
+          if (newPass.length < 6) {
+            showNotification('Mật khẩu mới phải từ 6 ký tự!', 'error');
+            return;
+          }
+          if (newPass !== confirmPass) {
+            showNotification('Xác nhận mật khẩu không khớp!', 'error');
+            return;
+          }
+          localStorage.setItem('adminPass', newPass);
+          showNotification('Đổi mật khẩu thành công!', 'success');
+          this.reset();
+        });
     </script>
 </body>
 </html>

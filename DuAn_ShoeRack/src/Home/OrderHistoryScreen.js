@@ -191,6 +191,27 @@ export default function OrderHistoryScreen({ onBack, onSelectOrder, themeColors 
     }
   };
 
+  // Thêm hàm xác nhận đã nhận hàng
+  const handleConfirmReceived = async (orderId) => {
+    try {
+      const patchUrl = `${API_CONFIG.BASE_URL}/orders/${orderId}`;
+      const res = await fetch(patchUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Đã nhận hàng' })
+      });
+      const data = await res.json();
+      if (data.status === 'Đã nhận hàng' || data.success) {
+        Toast.show({ type: 'success', text1: 'Cảm ơn bạn đã xác nhận!' });
+        fetchOrders();
+      } else {
+        Toast.show({ type: 'error', text1: 'Xác nhận thất bại!' });
+      }
+    } catch (err) {
+      Toast.show({ type: 'error', text1: 'Có lỗi khi xác nhận!' });
+    }
+  };
+
   const renderCancelModal = () => (
     <Modal
       visible={cancelModalVisible}
@@ -286,6 +307,27 @@ export default function OrderHistoryScreen({ onBack, onSelectOrder, themeColors 
           >
             <Text style={{color:'#fff',fontWeight:'bold'}}>Huỷ đơn</Text>
           </TouchableOpacity>
+        )}
+        {/* Nút xác nhận đã nhận hàng cho trạng thái Đã giao hàng, chỉ hiện nếu chưa là Đã nhận hàng */}
+        {item.status === 'Đã giao hàng' && (
+          <TouchableOpacity
+            style={{
+              marginTop: 8,
+              borderRadius: 8,
+              backgroundColor: '#3b82f6',
+              alignItems: 'center',
+              paddingVertical: 8,
+            }}
+            onPress={() => handleConfirmReceived(item.id)}
+          >
+            <Text style={{color:'#fff',fontWeight:'bold'}}>Đã nhận được hàng</Text>
+          </TouchableOpacity>
+        )}
+        {/* Nếu đã nhận hàng thì hiển thị trạng thái chuyên nghiệp */}
+        {item.status === 'Đã nhận hàng' && (
+          <View style={{marginTop: 8, borderRadius: 8, backgroundColor: '#10b981', alignItems: 'center', paddingVertical: 8}}>
+            <Text style={{color:'#fff',fontWeight:'bold'}}>Đã nhận hàng</Text>
+          </View>
         )}
       </View>
     );
